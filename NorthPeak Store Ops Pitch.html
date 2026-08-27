@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Databricks — NorthPeak Store Ops: Stockout &amp; Markdown Rescue</title>
+<link rel="stylesheet" href="./colors_and_type.css">
+<style>
+  html,body{margin:0;background:#0e1a1f;}
+  deck-stage:not(:defined){visibility:hidden}
+  /* ---- slide base ---- */
+  section{font-family:var(--font-sans);color:var(--db-ink);background:var(--db-oat-light);overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:64px 84px;display:flex;flex-direction:column;}
+  .slide.dark{background:var(--db-navy);color:#F4F1ED;}
+  .slide.white{background:#fff;}
+  a{color:var(--db-lava);text-decoration:none;}
+  a:hover{color:var(--db-coral);text-decoration:underline;}
+  .eyebrow{font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--db-lava);}
+  .dark .eyebrow{color:#FFC9BF;}
+  .title{font-size:52px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--db-navy);}
+  .dark .title{color:#fff;}
+  .subtitle{font-size:21px;font-weight:400;line-height:1.4;color:var(--db-ink-soft);}
+  .dark .subtitle{color:#B9C6CB;}
+  .body{font-size:18px;line-height:1.55;color:var(--db-ink);}
+  .footer{position:absolute;left:84px;right:84px;bottom:36px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--db-ink-muted);}
+  .dark .footer{color:#7E9098;}
+  .accent-bar{width:64px;height:6px;background:var(--db-lava);border-radius:3px;}
+  ul.bullets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px;}
+  ul.bullets li{position:relative;padding-left:26px;font-size:18px;line-height:1.45;color:var(--db-ink);}
+  ul.bullets li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;border-radius:2px;background:var(--db-coral);}
+  .dark ul.bullets li{color:#D9E1E4;}
+  .card{background:#fff;border-radius:14px;box-shadow:var(--shadow-md);padding:26px;display:flex;flex-direction:column;gap:11px;}
+  .card img.pico{width:52px;height:52px;}
+  .card .ct{font-size:22px;font-weight:700;color:var(--db-navy);}
+  .card .cb{font-size:16px;line-height:1.5;color:var(--db-ink-soft);}
+  .stat{display:flex;flex-direction:column;gap:6px;}
+  .stat .num{font-size:78px;font-weight:700;letter-spacing:-.03em;color:var(--db-lava);line-height:1;}
+  .stat .lab{font-size:18px;color:#B9C6CB;max-width:300px;line-height:1.4;}
+  /* ---- kpi ---- */
+  .kpi{background:#fff;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--db-line);padding:20px 22px;display:flex;flex-direction:column;gap:6px;}
+  .kpi .k-lab{font-size:14px;font-weight:600;color:var(--db-ink-muted);letter-spacing:.02em;}
+  .kpi .k-num{font-size:42px;font-weight:700;letter-spacing:-.02em;color:var(--db-navy);line-height:1;}
+  .kpi .k-sub{font-size:13px;color:var(--db-ink-soft);line-height:1.35;}
+  /* ---- action title ---- */
+  .action-kicker{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--db-lava);}
+  .action-title{font-size:33px;font-weight:700;line-height:1.18;letter-spacing:-.015em;color:var(--db-navy);max-width:1060px;}
+  .action-title .em{color:var(--db-lava);}
+  .action-rule{height:3px;width:100%;background:var(--db-oat-medium);margin:16px 0 26px;position:relative;}
+  .action-rule::before{content:"";position:absolute;left:0;top:0;height:3px;width:88px;background:var(--db-lava);}
+  .source-line{position:absolute;left:84px;bottom:28px;font-size:12px;font-style:italic;color:var(--db-ink-muted);}
+  /* ---- insight / quote ---- */
+  .insight{background:var(--db-navy);color:#F4F1ED;border-radius:12px;padding:24px 26px;display:flex;flex-direction:column;gap:12px;}
+  .insight .ih{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--db-coral);}
+  .insight .it{font-size:22px;font-weight:600;line-height:1.35;}
+  .insight .who{font-size:14px;color:#9FB0B6;}
+  /* ---- demo-arc flow ---- */
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:6px;}
+  .fstep{flex:1;background:#fff;border:1px solid var(--db-line);border-radius:12px;box-shadow:var(--shadow-sm);padding:18px 16px;display:flex;flex-direction:column;gap:8px;}
+  .fstep .fn{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--db-lava);}
+  .fstep .fh{font-size:19px;font-weight:700;color:var(--db-navy);line-height:1.1;}
+  .fstep .fd{font-size:14px;line-height:1.4;color:var(--db-ink-soft);}
+  .fstep.gov{background:var(--db-navy);border-color:var(--db-navy);}
+  .fstep.gov .fh{color:#fff;} .fstep.gov .fd{color:#C4D0D4;} .fstep.gov .fn{color:#FFC9BF;}
+  .farr{display:flex;align-items:center;justify-content:center;width:30px;color:var(--db-coral);font-size:24px;font-weight:700;flex:none;}
+  /* ---- 4 C grid ---- */
+  .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px;}
+  .cc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;}
+  .cc .cch{font-size:22px;font-weight:700;color:#fff;}
+  .cc .cck{font-family:var(--font-mono);font-size:13px;color:#FFC9BF;letter-spacing:.04em;}
+  .cc .ccd{font-size:15px;line-height:1.45;color:#C4D0D4;}
+  /* ---- three milestone lanes ---- */
+  .lanes{display:flex;align-items:stretch;gap:0;margin-top:6px;}
+  .lane{flex:1;background:#fff;border:1px solid var(--db-line);border-radius:12px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;}
+  .lane .lh{background:var(--db-navy);color:#fff;padding:12px 16px;display:flex;flex-direction:column;gap:2px;}
+  .lane.gov .lh{background:var(--db-lava);}
+  .lane .lm{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:#FFC9BF;}
+  .lane.gov .lm{color:#FFE3DD;}
+  .lane .lt{font-size:19px;font-weight:700;line-height:1.1;}
+  .lane .lb{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;}
+  .lane .icons{display:flex;gap:10px;align-items:center;}
+  .lane .icons img{width:34px;height:34px;}
+  .lane .ld{font-size:14.5px;line-height:1.45;color:var(--db-ink-soft);}
+  .lane .tag{font-family:var(--font-mono);font-size:12px;color:var(--db-navy);background:var(--db-oat-medium);border-radius:5px;padding:5px 8px;display:inline-block;width:fit-content;}
+  .lanearr{display:flex;align-items:center;justify-content:center;width:34px;color:var(--db-coral);font-size:26px;font-weight:700;flex:none;}
+  /* ---- spend chart ---- */
+  .chartcard{background:#fff;border:1px solid var(--db-line);border-radius:14px;box-shadow:var(--shadow-md);padding:22px 24px;display:flex;flex-direction:column;gap:14px;}
+  .chart-h{display:flex;justify-content:space-between;align-items:baseline;}
+  .chart-h .ct{font-size:17px;font-weight:700;color:var(--db-navy);}
+  .chart-h .cl{font-size:13px;color:var(--db-ink-muted);font-family:var(--font-mono);}
+  .tilerow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .tile{background:var(--db-oat-light);border:1px solid var(--db-line);border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+  .tile .tl{font-size:12px;font-weight:600;color:var(--db-ink-muted);letter-spacing:.02em;}
+  .tile .tn{font-size:26px;font-weight:700;color:var(--db-navy);letter-spacing:-.02em;line-height:1;}
+  .tile.hl{background:#FBEEEC;border-color:#F6C9C0;}
+  .tile.hl .tn{color:var(--db-lava);}
+  /* ---- two-column persona ---- */
+  .persona{display:flex;gap:0;margin-top:34px;}
+  .pcol{flex:1;padding:0 40px;}
+  .pcol:first-child{padding-left:0;}
+  .prole{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+  .pname{font-size:26px;font-weight:700;color:var(--db-navy);margin-bottom:18px;line-height:1.1;}
+  .pdiv{width:1px;background:var(--db-line);}
+</style>
+</head>
+<body>
+<deck-stage width="1280" height="720">
+
+  <!-- 1 · Cover -->
+  <section data-label="Cover">
+    <div class="slide dark">
+      <img src="./assets/brand/databricks-logo-white.svg" alt="Databricks" style="height:28px;width:auto;align-self:flex-start;">
+      <div style="display:flex;align-items:center;gap:14px;margin-top:38px;">
+        <div class="accent-bar"></div>
+        <span class="eyebrow">AI Customer Challenge · Retail Operations</span>
+      </div>
+      <div style="margin-top:auto;max-width:900px;">
+        <div class="title" style="font-size:74px;">Stockout &amp; Markdown Rescue</div>
+        <div class="subtitle" style="margin-top:22px;max-width:760px;">NorthPeak Store Ops: governed data, a governed recommendation, and a governed AI assistant, working as one solution.</div>
+      </div>
+      <img src="./assets/brand/illustration-nodal-02.svg" style="position:absolute;right:58px;top:78px;height:280px;opacity:.95;" alt="">
+      <div class="footer">
+        <span>Jonathan Whiteley · Databricks</span>
+        <span>FY27 Tech Summit</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · The problem, in Dana's words -->
+  <section data-label="The problem">
+    <div class="slide white">
+      <span class="action-kicker">The problem · Dana Ruiz, SVP Retail Operations</span>
+      <div class="action-title" style="margin-top:12px;">One cold snap flipped demand: the <span class="em">same five coats</span> are sold out in the North and piling toward markdown in the South.</div>
+      <div class="action-rule"></div>
+      <div style="display:flex;gap:40px;align-items:stretch;flex:1;">
+        <div style="flex:1.15;display:flex;flex-direction:column;gap:20px;">
+          <div class="body" style="max-width:520px;">Inventory was allocated to a normal-weather plan. A cold snap three weeks ago pulled demand North faster than the batch replenishment cycle could react. Today Dana sees two colors on one map: red stockouts in the North, amber dead stock in the South.</div>
+          <div class="insight">
+            <div class="ih">The question she asks</div>
+            <div class="it">"Store 214 is short on the Summit Down Parka. What's the best recovery move?"</div>
+            <div class="who">Store 214 · Denver, CO · today it takes weeks to answer</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;">
+          <div class="kpi">
+            <div class="k-lab">Lost-sales exposure · ~30 northern stores at zero on-hand</div>
+            <div class="k-num" style="color:var(--db-lava);">~$4.8M</div>
+            <div class="k-sub">Demand still climbing on the affected SKUs</div>
+          </div>
+          <div class="kpi">
+            <div class="k-lab">Markdown exposure · ~40 southern stores overstocked</div>
+            <div class="k-num" style="color:var(--db-amber,#B26A00);">~$5.6M</div>
+            <div class="k-sub">Margin clock running on the same five SKUs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · The outcome -->
+  <section data-label="The outcome">
+    <div class="slide dark">
+      <span class="eyebrow">The outcome we drive</span>
+      <div class="title" style="margin-top:12px;font-size:44px;max-width:1000px;">From "find out weeks later" to "see it, get the move, act today."</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:auto;margin-bottom:26px;">
+        <div class="stat"><span class="num">$10.4M</span><span class="lab">combined lost-sales and markdown exposure now addressable</span></div>
+        <div class="stat"><span class="num">Minutes</span><span class="lab">to a ranked, approved recovery move, not the next replenishment cycle</span></div>
+        <div class="stat"><span class="num">1 click</span><span class="lab">from insight to action, written back and reflected live</span></div>
+      </div>
+      <div class="body" style="color:#B9C6CB;font-size:17px;">The platform ranks the best recovery move for each short store: transfer from a nearby store, expedite from the warehouse, or offer a similar item, each scored by recaptured revenue.</div>
+    </div>
+  </section>
+
+  <!-- 4 · One connected solution -->
+  <section data-label="One solution">
+    <div class="slide">
+      <span class="action-kicker">How it works</span>
+      <div class="action-title" style="margin-top:12px;">One connected solution, not three separate builds: <span class="em">see it, ask why, get the move, act,</span> all governed.</div>
+      <div class="action-rule"></div>
+      <div class="flow">
+        <div class="fstep">
+          <div class="fn">01</div><div class="fh">See it</div>
+          <div class="fd">A US map: red stockouts in the North beside amber overstock in the South, with lost-sales and markdown KPIs.</div>
+        </div>
+        <div class="farr">&#8594;</div>
+        <div class="fstep">
+          <div class="fn">02</div><div class="fh">Ask why</div>
+          <div class="fd">Dana asks why Store 214 is short; the assistant investigates via Genie over the governed lakehouse.</div>
+        </div>
+        <div class="farr">&#8594;</div>
+        <div class="fstep">
+          <div class="fn">03</div><div class="fh">Get the move</div>
+          <div class="fd">It ranks transfer, expedite, or substitute by recaptured revenue and recommends the transfer, with a what-if.</div>
+        </div>
+        <div class="farr">&#8594;</div>
+        <div class="fstep">
+          <div class="fn">04</div><div class="fh">Act</div>
+          <div class="fd">Approve, and the move plus a markdown hold write back to Lakebase; the queue and KPIs update live.</div>
+        </div>
+        <div class="farr">&#8594;</div>
+        <div class="fstep gov">
+          <div class="fn">05</div><div class="fh">Governed AI</div>
+          <div class="fd">Every assistant call runs through Unity AI Gateway: spend cap, guardrails, per-store logging.</div>
+        </div>
+      </div>
+      <div class="source-line">Hero flow: Store 214 (Denver) recovers the Summit Down Parka via a transfer from a nearby overstocked store.</div>
+    </div>
+  </section>
+
+  <!-- 5 · Business value -->
+  <section data-label="Business value">
+    <div class="slide white">
+      <span class="action-kicker">Business value</span>
+      <div class="action-title" style="margin-top:12px;">Revenue recaptured, markdown avoided, risk governed, decisions in real time.</div>
+      <div class="action-rule"></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
+        <div class="card">
+          <div class="ct" style="color:var(--db-lava);">Revenue</div>
+          <div class="cb">Recapture lost sales on stocked-out SKUs by moving inventory to where demand is climbing, before the season passes.</div>
+        </div>
+        <div class="card">
+          <div class="ct" style="color:var(--db-lava);">Cost</div>
+          <div class="cb">Stop the markdown clock on dead stock in the South before margin erodes; hold price while stock moves.</div>
+        </div>
+        <div class="card">
+          <div class="ct" style="color:var(--db-lava);">Risk</div>
+          <div class="cb">Every recommendation, write-back, and AI call is governed and audited in Unity Catalog: one permission model.</div>
+        </div>
+        <div class="card">
+          <div class="ct" style="color:var(--db-lava);">Speed</div>
+          <div class="cb">A ranked, approvable recovery move in minutes, closing the gap the batch replenishment cycle leaves open.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Why Databricks -->
+  <section data-label="Why Databricks">
+    <div class="slide dark">
+      <span class="eyebrow">Why Databricks</span>
+      <div class="title" style="margin-top:12px;font-size:44px;">One governed platform. One control plane for AI cost.</div>
+      <div class="subtitle" style="margin-top:12px;max-width:900px;">The data, the recommendation, and the assistant all live on one platform: one place to govern Data and AI, one place to control AI cost.</div>
+      <div class="cgrid" style="margin-top:auto;margin-bottom:6px;">
+        <div class="cc"><div class="cck">Context</div><div class="cch">Context</div><div class="ccd">The assistant answers over NorthPeak's governed lakehouse, not a stale copy.</div></div>
+        <div class="cc"><div class="cck">Control</div><div class="cch">Control</div><div class="ccd">One permission model spans the data, the app's writes, and every AI call.</div></div>
+        <div class="cc"><div class="cck">Cost</div><div class="cch">Cost</div><div class="ccd">Unity AI Gateway caps, meters, and attributes assistant spend per store.</div></div>
+        <div class="cc"><div class="cck">Choice</div><div class="cch">Choice</div><div class="ccd">Open formats and model choice keep NorthPeak free of lock-in.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Technical depth: three milestones, one system -->
+  <section data-label="Three milestones">
+    <div class="slide">
+      <span class="action-kicker">The build</span>
+      <div class="action-title" style="margin-top:12px;">Three milestones wired into one system: <span class="em">governed data serves the app, the app acts on it, the AI inside it is governed.</span></div>
+      <div class="action-rule"></div>
+      <div class="lanes">
+        <div class="lane">
+          <div class="lh"><span class="lm">Milestone 1</span><span class="lt">Governed lakehouse</span></div>
+          <div class="lb">
+            <div class="icons">
+              <img src="./assets/brand/lakeflow-icon-full-color.svg" alt="Lakeflow">
+              <img src="./assets/brand/unity-catalog-icon-full-color.svg" alt="Unity Catalog">
+              <img src="./assets/brand/genie-icon-full-color.svg" alt="Genie">
+            </div>
+            <div class="ld">A declarative pipeline refines store and SKU data Bronze to Gold into one governed copy, queryable in natural language through Genie.</div>
+            <span class="tag">Unity Catalog · SDP · Genie</span>
+          </div>
+        </div>
+        <div class="lanearr">&#8594;</div>
+        <div class="lane">
+          <div class="lh"><span class="lm">Milestone 2</span><span class="lt">The app acts</span></div>
+          <div class="lb">
+            <div class="icons">
+              <img src="./assets/brand/apps-icon-full-color.svg" alt="Apps">
+              <img src="./assets/brand/lakebase-icon-full-color.svg" alt="Lakebase">
+            </div>
+            <div class="ld">The Store Ops app serves the map and recovery queue; on approval, the transfer and markdown hold write back transactionally to Lakebase.</div>
+            <span class="tag">Databricks App · Lakebase</span>
+          </div>
+        </div>
+        <div class="lanearr">&#8594;</div>
+        <div class="lane gov">
+          <div class="lh"><span class="lm">Milestone 3</span><span class="lt">The AI is governed</span></div>
+          <div class="lb">
+            <div class="icons">
+              <img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="Mosaic AI">
+            </div>
+            <div class="ld">Every assistant call routes through Unity AI Gateway: a hard spend cap, guardrails, and per-store logging, governed alongside the data.</div>
+            <span class="tag">Mosaic AI · Unity AI Gateway</span>
+          </div>
+        </div>
+      </div>
+      <div class="source-line">One solution end to end: the governed data feeds the app, the app acts on it, and the AI inside it is metered and capped.</div>
+    </div>
+  </section>
+
+  <!-- 8 · AI spend, shown and bounded -->
+  <section data-label="AI spend">
+    <div class="slide white">
+      <span class="action-kicker">AI spend, shown and bounded</span>
+      <div class="action-title" style="margin-top:12px;">You always know what the assistant costs: <span class="em">capped, per-store attributable, ~$200K/yr bounded.</span></div>
+      <div class="action-rule"></div>
+      <div style="display:flex;gap:36px;align-items:stretch;flex:1;">
+        <div class="chartcard" style="flex:1.25;">
+          <div class="chart-h">
+            <span class="ct">Assistant spend vs. monthly budget cap</span>
+            <span class="cl">Unity AI Gateway</span>
+          </div>
+          <svg viewBox="0 0 560 240" style="width:100%;height:auto;" role="img" aria-label="Monthly assistant spend held under the budget cap">
+            <!-- gridlines -->
+            <line x1="46" y1="20" x2="540" y2="20" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="70" x2="540" y2="70" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="120" x2="540" y2="120" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="170" x2="540" y2="170" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="200" x2="540" y2="200" stroke="#C9C6C0" stroke-width="1.5"/>
+            <!-- y labels ($K/mo) -->
+            <text x="38" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">20</text>
+            <text x="38" y="74" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">15</text>
+            <text x="38" y="124" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">10</text>
+            <text x="38" y="174" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">5</text>
+            <text x="38" y="204" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">0</text>
+            <!-- cap line at 16.7K/mo -> y = 200 - (16.7/20*180) = 49.7 -->
+            <line x1="46" y1="50" x2="540" y2="50" stroke="#1B3139" stroke-width="2" stroke-dasharray="6 5"/>
+            <text x="540" y="44" text-anchor="end" font-family="DM Mono, monospace" font-size="11" font-weight="700" fill="#1B3139">cap $16.7K/mo</text>
+            <!-- bars: values in $K -> height = v/20*180, x baseline 200 -->
+            <!-- Mar 11.5 -->
+            <rect x="70"  y="96.5" width="52" height="103.5" rx="4" fill="#FF5F46"/>
+            <rect x="150" y="74"   width="52" height="126"   rx="4" fill="#FF5F46"/>
+            <rect x="230" y="60.5" width="52" height="139.5" rx="4" fill="#FF5F46"/>
+            <rect x="310" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
+            <rect x="390" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
+            <rect x="470" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
+            <!-- x labels -->
+            <text x="96"  y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Mar</text>
+            <text x="176" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Apr</text>
+            <text x="256" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">May</text>
+            <text x="336" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jun</text>
+            <text x="416" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jul</text>
+            <text x="496" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Aug</text>
+          </svg>
+          <div class="tilerow">
+            <div class="tile"><div class="tl">Spend to date</div><div class="tn">$118K</div></div>
+            <div class="tile"><div class="tl">Annual cap</div><div class="tn">$200K</div></div>
+            <div class="tile"><div class="tl">Avg / store</div><div class="tn">$500</div></div>
+            <div class="tile hl"><div class="tl">Cap used</div><div class="tn">59%</div></div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;">
+          <div class="body" style="font-weight:600;color:var(--db-navy);font-size:19px;">For the AI spend owner, the value is predictability:</div>
+          <ul class="bullets">
+            <li>A hard budget cap the assistant cannot exceed, with alerts before it approaches.</li>
+            <li>Every call attributable to a store, so cost maps to the value it recovered.</li>
+            <li>Rate limits and guardrails governed in the same catalog as the data.</li>
+            <li>One dashboard answers "what is our AI costing us, and is it worth it."</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · Persona fit -->
+  <section data-label="Persona fit">
+    <div class="slide">
+      <span class="eyebrow">Built for the two people in the room</span>
+      <div class="title" style="margin-top:12px;font-size:44px;">What each of you gets.</div>
+      <div class="persona" style="flex:1;">
+        <div class="pcol">
+          <div class="prole" style="color:var(--db-lava);">The executive</div>
+          <div class="pname">Dana Ruiz<br>SVP Retail Operations</div>
+          <ul class="bullets">
+            <li>Opens one console and sees the problem on a map, in lost-sales and markdown dollars.</li>
+            <li>Asks a plain-language question and gets a ranked recovery move, no SQL required.</li>
+            <li>Approves the transfer in one click and watches the queue and KPIs update live.</li>
+            <li>Acts today instead of waiting for the next replenishment cycle.</li>
+          </ul>
+        </div>
+        <div class="pdiv"></div>
+        <div class="pcol">
+          <div class="prole" style="color:var(--db-navy);">The AI spend owner</div>
+          <div class="pname">Owner of AI cost<br>&amp; governance</div>
+          <ul class="bullets">
+            <li>Sees every assistant call metered, capped, and attributable to a store.</li>
+            <li>Sets a hard annual budget (~$200K) with alerts well before the cap.</li>
+            <li>Governs guardrails and access in the same Unity Catalog as the data.</li>
+            <li>Ties bounded AI cost directly to the revenue and margin it protects.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · Live demo + next steps -->
+  <section data-label="Live demo">
+    <div class="slide dark" style="justify-content:center;">
+      <img src="./assets/brand/databricks-logo-white.svg" alt="Databricks" style="height:26px;width:auto;align-self:flex-start;margin-bottom:30px;">
+      <span class="eyebrow">Live demo</span>
+      <div class="title" style="margin-top:12px;font-size:56px;">Let's watch Store 214 recover, live.</div>
+      <div class="subtitle" style="margin-top:18px;max-width:820px;">See it, ask why, get the move, act, all on one governed platform: the map lights up, Genie explains the shortfall, the transfer is ranked and approved, and the KPIs move, with every AI call capped and logged.</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:36px;">
+        <div class="accent-bar"></div>
+        <span style="font-size:15px;color:#B9C6CB;">Next: pilot the five cold-weather SKUs, then scale the pattern across the catalog · databricks.com</span>
+      </div>
+    </div>
+  </section>
+
+</deck-stage>
+<script src="./deck-stage.js"></script>
+</body>
+</html>

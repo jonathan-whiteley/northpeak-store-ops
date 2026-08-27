@@ -1,0 +1,469 @@
+@import "@databricks/appkit-ui/styles.css";
+/* Leaflet base CSS — imported here (not in StoreMap.tsx) so tile sizing is
+ * correct on first paint and HMR doesn't race the component import. */
+@import "leaflet/dist/leaflet.css";
+
+@plugin "@tailwindcss/typography";
+
+/* Fonts (Inter + Geist Mono) are loaded via <link> tags in index.html so the
+ * PostCSS `@import must precede all other statements` warning doesn't fire
+ * against Tailwind v4's ordering. */
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  /* ========================================================================
+   * NOCTURNE — dark theme tokens (single source of truth).
+   *
+   * Translated from design-ref/nocturne.css. Editing this :root block
+   * re-skins the WHOLE app (sidebar, header, chat, Home, Analytics,
+   * Dashboard) because every component consumes the semantic tokens below.
+   *
+   * Base: ground #161826 · surface #232532 · text #e9e9ed · blurple #9184d9.
+   * To re-skin again, replace the five --brand-* stops + the surfaces here.
+   * ====================================================================== */
+
+  /* Nocturne is a dark-only theme; lock form-control rendering to dark. */
+  color-scheme: dark;
+
+  /* ── Domain tokens (promoted from the mockup root) ──────────────────── */
+  --np-short: #ff6a52;      /* stockout / at_risk — northern shortfalls   */
+  --np-long: #ffab00;       /* overstock — southern markdown clock        */
+  --np-land: #1e2132;       /* map land fill                              */
+  --np-land-edge: #3a3f5c;  /* map land stroke                            */
+  /* Signature page ground — radial gradient from the mockup. */
+  --np-ground: radial-gradient(120% 80% at 4% -10%, #1e2136 0%, #161826 55%);
+
+  /* ── Brand palette — blurple + domain accents. Charts read these five
+   *    stops by index (ECharts/Recharts can't resolve CSS vars), so the
+   *    order also drives BRAND_PALETTE in lib/brand.ts. ─────────────────── */
+  --brand-1: #9184d9;   /* product blurple   — primary, chart anchor */
+  --brand-2: #a7a1db;   /* light blurple     — chart 2 */
+  --brand-3: #6ea8fe;   /* steel blue        — chart 3 */
+  --brand-4: #ffab00;   /* markdown amber    — chart 4 (np-long) */
+  --brand-5: #ff6a52;   /* shortfall coral   — chart 5 (np-short) */
+
+  --brand-canvas: #161826;
+  --brand-surface: #232532;
+  --brand-ink: #e9e9ed;
+  --brand-selection: #9184d9;
+
+  /* ========================================================================
+   * SEMANTIC TOKENS — what components actually consume.
+   * ====================================================================== */
+
+  --radius: 0.5rem;   /* nocturne radius-md (8px) */
+
+  /* Neutrals */
+  --background: #161826;
+  --foreground: #e9e9ed;
+  --card: #232532;
+  --card-foreground: #e9e9ed;
+  --popover: #232532;
+  --popover-foreground: #e9e9ed;
+  --muted: #262838;
+  --muted-foreground: #9397ab;
+  --border: color-mix(in srgb, #e9e9ed 14%, transparent);
+  --input: color-mix(in srgb, #e9e9ed 16%, transparent);
+  --ring: #9184d9;
+  --overlay: rgb(8 9 15 / 0.66);
+
+  /* Brand — primary + accent both blurple (single-accent nocturne) */
+  --primary: #9184d9;
+  --primary-foreground: #17182a;
+  --primary-light: #a7a1db;
+  --on-primary-hover: rgb(255 255 255 / 0.12);
+
+  --secondary: #262838;
+  --secondary-foreground: #e9e9ed;
+
+  --accent: #9184d9;
+  --accent-foreground: #17182a;
+
+  /* Status colors — semantic, tuned to read on the dark ground */
+  --destructive: #ff6a52;
+  --destructive-foreground: #17110f;
+  --success: #34c98b;
+  --success-foreground: #06120c;
+  --warning: #ffab00;
+  --warning-foreground: #1c1403;
+
+  /* Subtle status tints (translucent over dark surface + light text) */
+  --success-subtle: color-mix(in srgb, #34c98b 22%, transparent);
+  --success-subtle-foreground: #7ff0c0;
+  --warning-subtle: color-mix(in srgb, #ffab00 22%, transparent);
+  --warning-subtle-foreground: #ffd27a;
+  --info-subtle: color-mix(in srgb, #6ea8fe 22%, transparent);
+  --info-subtle-foreground: #b8d3ff;
+
+  /* ── NorthPeak Store-Ops POSITION STATUS ──────────────────────────────
+   * The store map + queue badge color by position_status:
+   *   stockout  → coral  (np-short — a top product a customer left without)
+   *   at_risk   → orange (about to stock out)
+   *   overstock → amber  (np-long — margin about to be discounted away)
+   *   healthy   → neutral slate
+   * The map (StoreMap) reads the *-map hexes directly (Leaflet SVG fills
+   * can't take var(...)); badges use the -subtle pairs. */
+  --pos-stockout: var(--np-short);
+  --pos-stockout-subtle: color-mix(in srgb, var(--np-short) 22%, transparent);
+  --pos-stockout-foreground: #ffb3a6;
+  --pos-at-risk: #ff8a4c;
+  --pos-at-risk-subtle: color-mix(in srgb, #ff8a4c 22%, transparent);
+  --pos-at-risk-foreground: #ffc19a;
+  --pos-overstock: var(--np-long);
+  --pos-overstock-subtle: color-mix(in srgb, var(--np-long) 22%, transparent);
+  --pos-overstock-foreground: #ffd27a;
+  --pos-healthy: #8a8fa6;
+  --pos-healthy-subtle: color-mix(in srgb, #8a8fa6 22%, transparent);
+  --pos-healthy-foreground: #cfd3e5;
+
+  /* Recovery-move badge accents (Transfer / Expedite / Substitute). */
+  --move-transfer: var(--accent);
+  --move-expedite: var(--np-long);
+  --move-substitute: var(--muted-foreground);
+  /* Direct reorder / restock write-back — info blue, distinct from the
+     blurple transfer accent so the manager action reads apart from the
+     agent-mediated recovery moves. */
+  --move-reorder: #6ea8fe;
+
+  /* Tier badges — retained for generic tier UI; unused by store-ops. */
+  --tier-gold: color-mix(in srgb, #ffab00 22%, transparent);
+  --tier-gold-foreground: #ffd27a;
+  --tier-silver: #33364a;
+  --tier-silver-foreground: #cfd3e5;
+  --tier-bronze: color-mix(in srgb, #b9793f 30%, transparent);
+  --tier-bronze-foreground: #e6b98a;
+  --tier-platinum: color-mix(in srgb, #9184d9 26%, transparent);
+  --tier-platinum-foreground: #cfc8f5;
+
+  /* Status indicator dots */
+  --status-running: var(--success);
+  --status-idle: var(--np-long);
+
+  /* Severity colors for inline text */
+  --severity-warning: #ffb84d;
+  --severity-danger: var(--destructive);
+
+  /* Charts — 5-stop palette in canonical order (see --brand-* above). */
+  --chart-1: var(--brand-1);
+  --chart-2: var(--brand-2);
+  --chart-3: var(--brand-3);
+  --chart-4: var(--brand-4);
+  --chart-5: var(--brand-5);
+
+  /* Sidebar — a hair darker than the surface so it reads as chrome. */
+  --sidebar: #1b1d2a;
+  --sidebar-foreground: #e9e9ed;
+  --sidebar-primary: #9184d9;
+  --sidebar-primary-foreground: #17182a;
+  --sidebar-accent: #2a2d3e;
+  --sidebar-accent-foreground: #e9e9ed;
+  --sidebar-border: color-mix(in srgb, #e9e9ed 12%, transparent);
+  --sidebar-ring: #9184d9;
+
+  /* ========================================================================
+   * SCENE-LEVEL DECORATIONS (PlatformView)
+   * ====================================================================== */
+  --platform-source-saas:    var(--brand-1);
+  --platform-source-erp:     var(--brand-2);
+  --platform-source-streams: var(--brand-3);
+  --platform-source-object:  var(--brand-4);
+  --platform-source-db:      var(--brand-5);
+
+  --medal-bronze: #c98a3f;
+  --medal-silver: #9ca3af;
+  --medal-gold:   #ffab00;
+
+  --trafficlight-red:    var(--np-short);
+  --trafficlight-yellow: var(--np-long);
+  --trafficlight-green:  var(--success);
+
+  /* Databricks brand red — used by the sidebar "Data + AI" pitch glow. */
+  --databricks-red: #EE3D2C;
+}
+
+html,
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01", "ss03";
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Paint the signature radial ground behind the main content region. The
+ * appkit SidebarInset (<main data-slot="sidebar-inset">) defaults to a solid
+ * bg-background; layering the gradient over it gives every page the nocturne
+ * ground without touching each view. */
+main[data-slot="sidebar-inset"] {
+  background:
+    radial-gradient(120% 80% at 4% -10%, #1e2136 0%, transparent 55%),
+    var(--background);
+}
+
+/* Dark, thin scrollbars so the light default track doesn't punch holes in
+ * the nocturne ground. */
+* {
+  scrollbar-color: color-mix(in srgb, #e9e9ed 22%, transparent) transparent;
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, #e9e9ed 18%, transparent);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, #e9e9ed 30%, transparent);
+  background-clip: content-box;
+}
+
+/* Every interactive control gets a pointer cursor; disabled → not-allowed. */
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+summary,
+label[for],
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled),
+select:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"],
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* Signature: freestanding rules fade to transparent at both ends (48px ramp) */
+.hr {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, #e9e9ed 16%, transparent) 48px,
+    color-mix(in srgb, #e9e9ed 16%, transparent) calc(100% - 48px),
+    transparent
+  );
+}
+
+::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+
+/* Indeterminate top-line progress bar used on data tables while reloading. */
+@keyframes loadingBar {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+/* -------- "What just changed" pulse — `usePulseOnChange` hook ----------- *
+ * Whenever the agent's write tool fires dataMutated, refetched surfaces use
+ * `usePulseOnChange(value)` and toggle one of these classes for ~1.5s on
+ * the specific elements whose value moved (a KPI count, a queue row's
+ * status badge, a map bubble's radius). Specific > screen-wide flash. */
+
+/* Soft expanding ring around a card/element — KPI cards use this. */
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0   color-mix(in oklch, var(--primary) 55%, transparent); }
+  60%  { box-shadow: 0 0 0 12px color-mix(in oklch, var(--primary) 0%,  transparent); }
+  100% { box-shadow: 0 0 0 0   color-mix(in oklch, var(--primary) 0%,  transparent); }
+}
+.animate-pulse-ring { animation: pulseRing 1.5s ease-out 1; }
+
+/* Subtle background highlight — queue rows that flipped status. */
+@keyframes pulseRow {
+  0%   { background-color: color-mix(in oklch, var(--primary) 18%, transparent); }
+  100% { background-color: transparent; }
+}
+.animate-pulse-row { animation: pulseRow 1.5s ease-out 1; }
+
+/* (Map bubbles pulse via Leaflet's setStyle on stroke weight — see
+ * StoreMap.tsx. A CSS-keyframe pulse on the SVG path doesn't survive
+ * Leaflet's redraws, so we don't define one here.) */
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01";
+  letter-spacing: -0.01em;
+}
+
+/* Chat dock trigger — slide-up entrance + synced sparkle & color breathe.
+   The two diagonal gradients (one in --primary, one in --primary-light)
+   appear in 4 places; the @property declarations let dockBreathe
+   crossfade between them via CSS animation. */
+/* Animatable color custom prop so dockBreathe can crossfade the
+   gradient by reassigning --dock-tint instead of redefining the whole
+   linear-gradient on every keyframe. */
+@property --dock-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #9184d9;
+}
+/* dockBreathe sets `--dock-tint` on the breathing element; for static
+   uses (the dock entry button before it starts breathing) we anchor it
+   to --primary at the document root. */
+:root {
+  --dock-tint: var(--primary);
+  --dock-gradient: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--dock-tint) 82%, white) 0%,
+    var(--dock-tint) 55%,
+    color-mix(in oklch, var(--dock-tint) 88%, black) 100%
+  );
+}
+
+@keyframes dockEnter {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 1;   transform: rotate(0deg)  scale(1); }
+  50%      { opacity: 0.4; transform: rotate(20deg) scale(1.15); }
+}
+@keyframes dockBreathe {
+  0%, 100% {
+    --dock-tint: var(--primary);
+    box-shadow: 0 4px 14px oklch(from var(--primary) l c h / 0.3);
+  }
+  50% {
+    --dock-tint: var(--primary-light);
+    box-shadow: 0 4px 20px oklch(from var(--primary-light) l c h / 0.45);
+  }
+}
+.animate-dock-enter  { animation: dockEnter 0.4s ease-out, dockBreathe 3s ease-in-out 1s infinite; }
+.animate-sparkle     { animation: sparkle 3s ease-in-out infinite 1s; }
+
+/* -------- Sidebar pitch box (Databricks Data + AI) -------- */
+
+.dx-sidebar-pitch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--accent) 18%, var(--sidebar)) 0%,
+    color-mix(in oklch, var(--accent) 9%, var(--sidebar)) 100%
+  );
+  border: 1px solid color-mix(in oklch, var(--accent) 42%, var(--sidebar-border));
+  text-decoration: none;
+  color: var(--sidebar-foreground);
+  overflow: hidden;
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+              0 8px 20px -10px color-mix(in oklch, var(--accent) 35%, transparent);
+}
+
+.dx-sidebar-pitch:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklch, var(--accent) 60%, var(--sidebar-border));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04),
+              0 12px 28px -10px color-mix(in oklch, var(--accent) 50%, transparent);
+}
+
+.dx-sidebar-pitch-glow {
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 100px;
+  height: 100px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--accent) 35%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: dx-sidebar-pitch-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes dx-sidebar-pitch-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+
+.dx-sidebar-pitch-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border: 1px solid color-mix(in oklch, var(--databricks-red) 30%, var(--sidebar-border));
+  box-shadow: 0 0 0 0 color-mix(in oklch, var(--databricks-red) 50%, transparent);
+  animation: dx-sidebar-pitch-icon-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes dx-sidebar-pitch-icon-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--databricks-red) 55%, transparent); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in oklch, var(--databricks-red) 0%, transparent); }
+}
+
+.dx-sidebar-pitch-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.dx-sidebar-pitch-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  line-height: 1.2;
+}
+
+.dx-sidebar-pitch-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+
+/* Constrain Leaflet's stacking context. Leaflet's panes (tile=200, marker=600,
+ * popup=700, tooltip=650) all default to a z-index that floats ABOVE Tailwind's
+ * `z-40` chat dock and any other floating UI. Capping the map container's own
+ * stacking context (z-index: 0 + isolation: isolate) keeps Leaflet from
+ * escaping its parent. */
+.leaflet-container {
+  z-index: 0;
+  isolation: isolate;
+  background: var(--np-land);
+}
+
+/* Nocturne map tooltips — Leaflet's default white bubble is jarring on the
+ * dark map. Repaint to the surface token. */
+.leaflet-tooltip {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  border-radius: 8px;
+}
+.leaflet-tooltip-top::before { border-top-color: var(--card); }
+.leaflet-tooltip-bottom::before { border-bottom-color: var(--card); }
+.leaflet-tooltip-left::before { border-left-color: var(--card); }
+.leaflet-tooltip-right::before { border-right-color: var(--card); }
+
+/* CARTO dark tiles ship slightly too bright for the ground; nudge them. */
+.leaflet-tile { filter: brightness(0.92) saturate(0.9); }

@@ -1,0 +1,19 @@
+# deps / build
+node_modules/
+dist/
+build/
+app/node_modules/
+app/dist/
+app/drizzle/
+app/.preview.pgid
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+.databricks/
+
+# logs / os
+*.log
+.DS_Store

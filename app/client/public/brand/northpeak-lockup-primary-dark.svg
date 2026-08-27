@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="92" viewBox="0 0 300 92">
+  <g transform="translate(14 23) scale(0.71875)" fill="none" stroke-width="4.5" stroke-linecap="square">
+    <path d="M6 46 L20 27 L30 40" stroke="#5d5294"></path>
+    <path d="M22 46 L39 20 L57 46" stroke="#9184d9"></path>
+  </g>
+  <text x="74" y="47" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="500" letter-spacing="3.1" fill="#e9e9ed">NORTHPEAK</text>
+  <text x="76" y="66" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="400" letter-spacing="3.4" fill="#8f92a3">RETAIL</text>
+</svg>
