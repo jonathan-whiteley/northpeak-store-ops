@@ -44,3 +44,13 @@ env:
   # placeholder resolution.
   - name: WAREHOUSE_ID
     valueFrom: sql-warehouse
+
+  # ── Plain-value env (normally harvested by finalize_app.sh from the
+  #    setup job's export_resources output; that flow was NOT run here, so
+  #    these are set directly). DASHBOARD_ID left unset (no dashboard).
+  - name: DEMO_CATALOG
+    value: team_wishcraft_catalog
+  - name: DEMO_SCHEMA
+    value: northpeak
+  - name: GENIE_SPACE_ID
+    value: 01f1a239a6e8167f8ac0914cb0836fd5

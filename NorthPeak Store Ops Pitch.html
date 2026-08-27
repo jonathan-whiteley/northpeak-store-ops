@@ -8,97 +8,116 @@
 <style>
   html,body{margin:0;background:#0e1a1f;}
   deck-stage:not(:defined){visibility:hidden}
-  /* ---- slide base ---- */
   section{font-family:var(--font-sans);color:var(--db-ink);background:var(--db-oat-light);overflow:hidden;}
-  .slide{position:absolute;inset:0;padding:64px 84px;display:flex;flex-direction:column;}
+  .slide{position:absolute;inset:0;padding:60px 80px;display:flex;flex-direction:column;}
   .slide.dark{background:var(--db-navy);color:#F4F1ED;}
   .slide.white{background:#fff;}
   a{color:var(--db-lava);text-decoration:none;}
   a:hover{color:var(--db-coral);text-decoration:underline;}
   .eyebrow{font-size:14px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--db-lava);}
   .dark .eyebrow{color:#FFC9BF;}
-  .title{font-size:52px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--db-navy);}
+  .title{font-size:50px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--db-navy);}
   .dark .title{color:#fff;}
-  .subtitle{font-size:21px;font-weight:400;line-height:1.4;color:var(--db-ink-soft);}
+  .subtitle{font-size:20px;font-weight:400;line-height:1.4;color:var(--db-ink-soft);}
   .dark .subtitle{color:#B9C6CB;}
   .body{font-size:18px;line-height:1.55;color:var(--db-ink);}
-  .footer{position:absolute;left:84px;right:84px;bottom:36px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--db-ink-muted);}
+  .footer{position:absolute;left:80px;right:80px;bottom:34px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--db-ink-muted);}
   .dark .footer{color:#7E9098;}
   .accent-bar{width:64px;height:6px;background:var(--db-lava);border-radius:3px;}
-  ul.bullets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:13px;}
-  ul.bullets li{position:relative;padding-left:26px;font-size:18px;line-height:1.45;color:var(--db-ink);}
+  ul.bullets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;}
+  ul.bullets li{position:relative;padding-left:26px;font-size:18px;line-height:1.42;color:var(--db-ink);}
   ul.bullets li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;border-radius:2px;background:var(--db-coral);}
   .dark ul.bullets li{color:#D9E1E4;}
-  .card{background:#fff;border-radius:14px;box-shadow:var(--shadow-md);padding:26px;display:flex;flex-direction:column;gap:11px;}
-  .card img.pico{width:52px;height:52px;}
-  .card .ct{font-size:22px;font-weight:700;color:var(--db-navy);}
-  .card .cb{font-size:16px;line-height:1.5;color:var(--db-ink-soft);}
+  .card{background:#fff;border-radius:14px;box-shadow:var(--shadow-md);padding:24px;display:flex;flex-direction:column;gap:10px;}
+  .card img.pico{width:40px;height:40px;}
+  .card .ct{font-size:21px;font-weight:700;color:var(--db-navy);}
+  .card .cb{font-size:15.5px;line-height:1.48;color:var(--db-ink-soft);}
   .stat{display:flex;flex-direction:column;gap:6px;}
-  .stat .num{font-size:78px;font-weight:700;letter-spacing:-.03em;color:var(--db-lava);line-height:1;}
-  .stat .lab{font-size:18px;color:#B9C6CB;max-width:300px;line-height:1.4;}
-  /* ---- kpi ---- */
-  .kpi{background:#fff;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--db-line);padding:20px 22px;display:flex;flex-direction:column;gap:6px;}
+  .stat .num{font-size:74px;font-weight:700;letter-spacing:-.03em;color:var(--db-lava);line-height:1;}
+  .stat .lab{font-size:17px;color:#B9C6CB;max-width:300px;line-height:1.4;}
+  .kpi{background:#fff;border-radius:12px;box-shadow:var(--shadow-sm);border:1px solid var(--db-line);padding:18px 22px;display:flex;flex-direction:column;gap:6px;}
   .kpi .k-lab{font-size:14px;font-weight:600;color:var(--db-ink-muted);letter-spacing:.02em;}
-  .kpi .k-num{font-size:42px;font-weight:700;letter-spacing:-.02em;color:var(--db-navy);line-height:1;}
+  .kpi .k-num{font-size:40px;font-weight:700;letter-spacing:-.02em;color:var(--db-navy);line-height:1;}
   .kpi .k-sub{font-size:13px;color:var(--db-ink-soft);line-height:1.35;}
-  /* ---- action title ---- */
   .action-kicker{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--db-lava);}
-  .action-title{font-size:33px;font-weight:700;line-height:1.18;letter-spacing:-.015em;color:var(--db-navy);max-width:1060px;}
+  .action-title{font-size:32px;font-weight:700;line-height:1.16;letter-spacing:-.015em;color:var(--db-navy);max-width:1080px;}
   .action-title .em{color:var(--db-lava);}
-  .action-rule{height:3px;width:100%;background:var(--db-oat-medium);margin:16px 0 26px;position:relative;}
+  .action-rule{height:3px;width:100%;background:var(--db-oat-medium);margin:14px 0 22px;position:relative;}
   .action-rule::before{content:"";position:absolute;left:0;top:0;height:3px;width:88px;background:var(--db-lava);}
-  .source-line{position:absolute;left:84px;bottom:28px;font-size:12px;font-style:italic;color:var(--db-ink-muted);}
-  /* ---- insight / quote ---- */
-  .insight{background:var(--db-navy);color:#F4F1ED;border-radius:12px;padding:24px 26px;display:flex;flex-direction:column;gap:12px;}
+  .source-line{position:absolute;left:80px;bottom:26px;font-size:12px;font-style:italic;color:var(--db-ink-muted);}
+  .dark .source-line{color:#7E9098;}
+  .insight{background:var(--db-navy);color:#F4F1ED;border-radius:12px;padding:22px 24px;display:flex;flex-direction:column;gap:11px;}
   .insight .ih{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--db-coral);}
-  .insight .it{font-size:22px;font-weight:600;line-height:1.35;}
+  .insight .it{font-size:21px;font-weight:600;line-height:1.35;}
   .insight .who{font-size:14px;color:#9FB0B6;}
-  /* ---- demo-arc flow ---- */
-  .flow{display:flex;align-items:stretch;gap:0;margin-top:6px;}
-  .fstep{flex:1;background:#fff;border:1px solid var(--db-line);border-radius:12px;box-shadow:var(--shadow-sm);padding:18px 16px;display:flex;flex-direction:column;gap:8px;}
+  /* demo-arc flow */
+  .flow{display:flex;align-items:stretch;gap:0;margin-top:4px;}
+  .fstep{flex:1;background:#fff;border:1px solid var(--db-line);border-radius:12px;box-shadow:var(--shadow-sm);padding:16px 15px;display:flex;flex-direction:column;gap:7px;}
   .fstep .fn{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--db-lava);}
-  .fstep .fh{font-size:19px;font-weight:700;color:var(--db-navy);line-height:1.1;}
-  .fstep .fd{font-size:14px;line-height:1.4;color:var(--db-ink-soft);}
+  .fstep .fh{font-size:18px;font-weight:700;color:var(--db-navy);line-height:1.1;}
+  .fstep .fd{font-size:13.5px;line-height:1.38;color:var(--db-ink-soft);}
   .fstep.gov{background:var(--db-navy);border-color:var(--db-navy);}
   .fstep.gov .fh{color:#fff;} .fstep.gov .fd{color:#C4D0D4;} .fstep.gov .fn{color:#FFC9BF;}
-  .farr{display:flex;align-items:center;justify-content:center;width:30px;color:var(--db-coral);font-size:24px;font-weight:700;flex:none;}
-  /* ---- 4 C grid ---- */
-  .cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:8px;}
-  .cc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;}
-  .cc .cch{font-size:22px;font-weight:700;color:#fff;}
-  .cc .cck{font-family:var(--font-mono);font-size:13px;color:#FFC9BF;letter-spacing:.04em;}
-  .cc .ccd{font-size:15px;line-height:1.45;color:#C4D0D4;}
-  /* ---- three milestone lanes ---- */
-  .lanes{display:flex;align-items:stretch;gap:0;margin-top:6px;}
+  .farr{display:flex;align-items:center;justify-content:center;width:28px;color:var(--db-coral);font-size:22px;font-weight:700;flex:none;}
+  /* 4 C's cards */
+  .cc4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:auto;margin-bottom:4px;}
+  .cc4 .cx{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.15);border-radius:13px;padding:20px 18px;display:flex;flex-direction:column;gap:10px;}
+  .cc4 .cx img{width:38px;height:38px;}
+  .cc4 .cxh{font-size:22px;font-weight:700;color:#fff;}
+  .cc4 .cxs{font-size:14px;font-style:italic;line-height:1.35;color:#9FB0B6;}
+  .cc4 .cxd{font-size:14.5px;line-height:1.42;color:#DCE4E7;}
+  .cc4 .cxd b{color:#FFC9BF;font-weight:700;font-style:normal;}
+  /* platform stack */
+  .pstack{display:flex;flex-direction:column;gap:8px;margin-top:2px;}
+  .pband{display:grid;grid-template-columns:184px 1fr 168px;align-items:center;gap:16px;background:#fff;border:1px solid var(--db-line);border-radius:11px;padding:11px 16px;box-shadow:var(--shadow-sm);}
+  .pband.gov{background:#FBEEEC;border-color:#F3B7AC;}
+  .pband .plabel{font-size:15px;font-weight:700;color:var(--db-navy);line-height:1.12;}
+  .pband .psub{font-family:var(--font-mono);font-size:10.5px;color:var(--db-ink-muted);letter-spacing:.02em;margin-top:2px;}
+  .pchips{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+  .chip{display:flex;align-items:center;gap:8px;background:var(--db-oat-light);border:1px solid var(--db-line);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:600;color:var(--db-navy);}
+  .chip img{width:24px;height:24px;}
+  .chip.txt{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:var(--db-ink-soft);background:#fff;}
+  .bcell{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;}
+  .cbadge{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--db-lava);border-radius:6px;padding:6px 11px;}
+  .cbadge.navy{background:var(--db-navy);}
+  .cbadge.ghost{background:#fff;color:var(--db-ink-muted);border:1px solid var(--db-line);}
+  /* milestone lanes */
+  .lanes{display:flex;align-items:stretch;gap:0;margin-top:4px;}
   .lane{flex:1;background:#fff;border:1px solid var(--db-line);border-radius:12px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;}
   .lane .lh{background:var(--db-navy);color:#fff;padding:12px 16px;display:flex;flex-direction:column;gap:2px;}
   .lane.gov .lh{background:var(--db-lava);}
   .lane .lm{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;color:#FFC9BF;}
   .lane.gov .lm{color:#FFE3DD;}
   .lane .lt{font-size:19px;font-weight:700;line-height:1.1;}
-  .lane .lb{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;}
-  .lane .icons{display:flex;gap:10px;align-items:center;}
-  .lane .icons img{width:34px;height:34px;}
+  .lane .lb{padding:16px;display:flex;flex-direction:column;gap:13px;flex:1;}
+  .lane .icons{display:flex;gap:12px;align-items:center;}
+  .lane .icons img{width:46px;height:46px;}
   .lane .ld{font-size:14.5px;line-height:1.45;color:var(--db-ink-soft);}
   .lane .tag{font-family:var(--font-mono);font-size:12px;color:var(--db-navy);background:var(--db-oat-medium);border-radius:5px;padding:5px 8px;display:inline-block;width:fit-content;}
-  .lanearr{display:flex;align-items:center;justify-content:center;width:34px;color:var(--db-coral);font-size:26px;font-weight:700;flex:none;}
-  /* ---- spend chart ---- */
-  .chartcard{background:#fff;border:1px solid var(--db-line);border-radius:14px;box-shadow:var(--shadow-md);padding:22px 24px;display:flex;flex-direction:column;gap:14px;}
-  .chart-h{display:flex;justify-content:space-between;align-items:baseline;}
-  .chart-h .ct{font-size:17px;font-weight:700;color:var(--db-navy);}
-  .chart-h .cl{font-size:13px;color:var(--db-ink-muted);font-family:var(--font-mono);}
-  .tilerow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-  .tile{background:var(--db-oat-light);border:1px solid var(--db-line);border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+  .lanearr{display:flex;align-items:center;justify-content:center;width:32px;color:var(--db-coral);font-size:24px;font-weight:700;flex:none;}
+  /* spend chart */
+  .chartcard{background:#fff;border:1px solid var(--db-line);border-radius:14px;box-shadow:var(--shadow-md);padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+  .chart-h{display:flex;justify-content:space-between;align-items:center;}
+  .chart-h .ct{font-size:16px;font-weight:700;color:var(--db-navy);}
+  .chart-h .cl{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--db-ink-muted);font-family:var(--font-mono);}
+  .chart-h .cl img{width:18px;height:18px;}
+  .tilerow{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+  .tile{background:var(--db-oat-light);border:1px solid var(--db-line);border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:4px;}
   .tile .tl{font-size:12px;font-weight:600;color:var(--db-ink-muted);letter-spacing:.02em;}
-  .tile .tn{font-size:26px;font-weight:700;color:var(--db-navy);letter-spacing:-.02em;line-height:1;}
+  .tile .tn{font-size:25px;font-weight:700;color:var(--db-navy);letter-spacing:-.02em;line-height:1;}
   .tile.hl{background:#FBEEEC;border-color:#F6C9C0;}
   .tile.hl .tn{color:var(--db-lava);}
-  /* ---- two-column persona ---- */
-  .persona{display:flex;gap:0;margin-top:34px;}
-  .pcol{flex:1;padding:0 40px;}
+  /* proof */
+  .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:auto;margin-bottom:20px;}
+  .proof .pnum{font-size:72px;font-weight:700;letter-spacing:-.03em;color:var(--db-lava);line-height:1;}
+  .proof .pdesc{font-size:16px;color:#C8D2D5;line-height:1.4;margin-top:10px;max-width:290px;}
+  .proof .pwho{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7E9098;margin-top:12px;}
+  /* persona */
+  .persona{display:flex;gap:0;margin-top:30px;flex:1;}
+  .pcol{flex:1;padding:0 38px;}
   .pcol:first-child{padding-left:0;}
   .prole{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
-  .pname{font-size:26px;font-weight:700;color:var(--db-navy);margin-bottom:18px;line-height:1.1;}
+  .pname{font-size:25px;font-weight:700;color:var(--db-navy);margin-bottom:16px;line-height:1.1;}
   .pdiv{width:1px;background:var(--db-line);}
 </style>
 </head>
@@ -109,15 +128,15 @@
   <section data-label="Cover">
     <div class="slide dark">
       <img src="./assets/brand/databricks-logo-white.svg" alt="Databricks" style="height:28px;width:auto;align-self:flex-start;">
-      <div style="display:flex;align-items:center;gap:14px;margin-top:38px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-top:36px;">
         <div class="accent-bar"></div>
         <span class="eyebrow">AI Customer Challenge · Retail Operations</span>
       </div>
       <div style="margin-top:auto;max-width:900px;">
-        <div class="title" style="font-size:74px;">Stockout &amp; Markdown Rescue</div>
-        <div class="subtitle" style="margin-top:22px;max-width:760px;">NorthPeak Store Ops: governed data, a governed recommendation, and a governed AI assistant, working as one solution.</div>
+        <div class="title" style="font-size:72px;">Stockout &amp; Markdown Rescue</div>
+        <div class="subtitle" style="margin-top:22px;max-width:770px;">NorthPeak Store Ops: governed data, a governed recommendation, and a governed AI assistant, working as one solution.</div>
       </div>
-      <img src="./assets/brand/illustration-nodal-02.svg" style="position:absolute;right:58px;top:78px;height:280px;opacity:.95;" alt="">
+      <img src="./assets/brand/illustration-nodal-02.svg" style="position:absolute;right:56px;top:74px;height:270px;opacity:.95;" alt="">
       <div class="footer">
         <span>Jonathan Whiteley · Databricks</span>
         <span>FY27 Tech Summit</span>
@@ -131,8 +150,8 @@
       <span class="action-kicker">The problem · Dana Ruiz, SVP Retail Operations</span>
       <div class="action-title" style="margin-top:12px;">One cold snap flipped demand: the <span class="em">same five coats</span> are sold out in the North and piling toward markdown in the South.</div>
       <div class="action-rule"></div>
-      <div style="display:flex;gap:40px;align-items:stretch;flex:1;">
-        <div style="flex:1.15;display:flex;flex-direction:column;gap:20px;">
+      <div style="display:flex;gap:38px;align-items:stretch;flex:1;">
+        <div style="flex:1.15;display:flex;flex-direction:column;gap:18px;">
           <div class="body" style="max-width:520px;">Inventory was allocated to a normal-weather plan. A cold snap three weeks ago pulled demand North faster than the batch replenishment cycle could react. Today Dana sees two colors on one map: red stockouts in the North, amber dead stock in the South.</div>
           <div class="insight">
             <div class="ih">The question she asks</div>
@@ -140,7 +159,7 @@
             <div class="who">Store 214 · Denver, CO · today it takes weeks to answer</div>
           </div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center;">
+        <div style="flex:1;display:flex;flex-direction:column;gap:15px;justify-content:center;">
           <div class="kpi">
             <div class="k-lab">Lost-sales exposure · ~30 northern stores at zero on-hand</div>
             <div class="k-num" style="color:var(--db-lava);">~$4.8M</div>
@@ -148,7 +167,7 @@
           </div>
           <div class="kpi">
             <div class="k-lab">Markdown exposure · ~40 southern stores overstocked</div>
-            <div class="k-num" style="color:var(--db-amber,#B26A00);">~$5.6M</div>
+            <div class="k-num" style="color:#B26A00;">~$5.6M</div>
             <div class="k-sub">Margin clock running on the same five SKUs</div>
           </div>
         </div>
@@ -160,8 +179,8 @@
   <section data-label="The outcome">
     <div class="slide dark">
       <span class="eyebrow">The outcome we drive</span>
-      <div class="title" style="margin-top:12px;font-size:44px;max-width:1000px;">From "find out weeks later" to "see it, get the move, act today."</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:auto;margin-bottom:26px;">
+      <div class="title" style="margin-top:12px;font-size:42px;max-width:1000px;">From "find out weeks later" to "see it, get the move, act today."</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:38px;margin-top:auto;margin-bottom:24px;">
         <div class="stat"><span class="num">$10.4M</span><span class="lab">combined lost-sales and markdown exposure now addressable</span></div>
         <div class="stat"><span class="num">Minutes</span><span class="lab">to a ranked, approved recovery move, not the next replenishment cycle</span></div>
         <div class="stat"><span class="num">1 click</span><span class="lab">from insight to action, written back and reflected live</span></div>
@@ -212,20 +231,24 @@
       <span class="action-kicker">Business value</span>
       <div class="action-title" style="margin-top:12px;">Revenue recaptured, markdown avoided, risk governed, decisions in real time.</div>
       <div class="action-rule"></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         <div class="card">
+          <img class="pico" src="./assets/brand/genie-icon-full-color.svg" alt="">
           <div class="ct" style="color:var(--db-lava);">Revenue</div>
           <div class="cb">Recapture lost sales on stocked-out SKUs by moving inventory to where demand is climbing, before the season passes.</div>
         </div>
         <div class="card">
+          <img class="pico" src="./assets/brand/lakebase-icon-full-color.svg" alt="">
           <div class="ct" style="color:var(--db-lava);">Cost</div>
           <div class="cb">Stop the markdown clock on dead stock in the South before margin erodes; hold price while stock moves.</div>
         </div>
         <div class="card">
+          <img class="pico" src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">
           <div class="ct" style="color:var(--db-lava);">Risk</div>
           <div class="cb">Every recommendation, write-back, and AI call is governed and audited in Unity Catalog: one permission model.</div>
         </div>
         <div class="card">
+          <img class="pico" src="./assets/brand/lakeflow-icon-full-color.svg" alt="">
           <div class="ct" style="color:var(--db-lava);">Speed</div>
           <div class="cb">A ranked, approvable recovery move in minutes, closing the gap the batch replenishment cycle leaves open.</div>
         </div>
@@ -233,22 +256,96 @@
     </div>
   </section>
 
-  <!-- 6 · Why Databricks -->
-  <section data-label="Why Databricks">
+  <!-- 6 · The 4 C's -->
+  <section data-label="The 4 C's">
     <div class="slide dark">
-      <span class="eyebrow">Why Databricks</span>
-      <div class="title" style="margin-top:12px;font-size:44px;">One governed platform. One control plane for AI cost.</div>
-      <div class="subtitle" style="margin-top:12px;max-width:900px;">The data, the recommendation, and the assistant all live on one platform: one place to govern Data and AI, one place to control AI cost.</div>
-      <div class="cgrid" style="margin-top:auto;margin-bottom:6px;">
-        <div class="cc"><div class="cck">Context</div><div class="cch">Context</div><div class="ccd">The assistant answers over NorthPeak's governed lakehouse, not a stale copy.</div></div>
-        <div class="cc"><div class="cck">Control</div><div class="cch">Control</div><div class="ccd">One permission model spans the data, the app's writes, and every AI call.</div></div>
-        <div class="cc"><div class="cck">Cost</div><div class="cch">Cost</div><div class="ccd">Unity AI Gateway caps, meters, and attributes assistant spend per store.</div></div>
-        <div class="cc"><div class="cck">Choice</div><div class="cch">Choice</div><div class="ccd">Open formats and model choice keep NorthPeak free of lock-in.</div></div>
+      <span class="eyebrow">The four criteria for enterprise AI</span>
+      <div class="title" style="margin-top:12px;font-size:42px;">Winning with AI takes more than a model.</div>
+      <div class="subtitle" style="margin-top:12px;max-width:940px;">It takes Context, Control, Cost, and Choice: the four things NorthPeak's assistant has to get right, and the four Databricks was built to solve.</div>
+      <div class="cc4">
+        <div class="cx">
+          <img src="./assets/brand/genie-icon-full-color.svg" alt="">
+          <div class="cxh">Context</div>
+          <div class="cxs">"Connecting AI to data is difficult."</div>
+          <div class="cxd"><b>NorthPeak:</b> the assistant answers over the governed lakehouse, not a stale copy.</div>
+        </div>
+        <div class="cx">
+          <img src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">
+          <div class="cxh">Control</div>
+          <div class="cxs">"Controlling AI and data use is required."</div>
+          <div class="cxd"><b>NorthPeak:</b> one permission model spans the data, the app's writes, and every AI call.</div>
+        </div>
+        <div class="cx">
+          <img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">
+          <div class="cxh">Cost</div>
+          <div class="cxs">"Optimizing cost is becoming essential."</div>
+          <div class="cxd"><b>NorthPeak:</b> Unity AI Gateway caps and meters assistant spend, per store.</div>
+        </div>
+        <div class="cx">
+          <img src="./assets/brand/lakehouse-icon-full-color.svg" alt="">
+          <div class="cxh">Choice</div>
+          <div class="cxs">"Avoiding lock-in is key for innovation."</div>
+          <div class="cxd"><b>NorthPeak:</b> open formats and model choice keep the platform free of lock-in.</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 7 · Technical depth: three milestones, one system -->
+  <!-- 7 · Why Databricks: the platform stack -->
+  <section data-label="Why Databricks">
+    <div class="slide white">
+      <span class="action-kicker">Why Databricks</span>
+      <div class="action-title" style="margin-top:12px;">One governed platform: <span class="em">one place to govern Data and AI, one place to control AI cost.</span></div>
+      <div class="action-rule" style="margin-bottom:16px;"></div>
+      <div class="pstack">
+        <div class="pband">
+          <div><div class="plabel">Agentic dev &amp; work</div><div class="psub">the people-facing layer</div></div>
+          <div class="pchips">
+            <div class="chip"><img src="./assets/brand/genie-icon-full-color.svg" alt="">Genie</div>
+            <div class="chip"><img src="./assets/brand/agent-bricks-icon-full-color.svg" alt="">Agent Bricks</div>
+            <div class="chip"><img src="./assets/brand/apps-icon-full-color.svg" alt="">Store Ops App</div>
+          </div>
+          <div class="bcell"><span class="cbadge ghost">AI coworkers</span></div>
+        </div>
+        <div class="pband">
+          <div><div class="plabel">Enterprise context</div><div class="psub">Genie Ontology</div></div>
+          <div class="pchips">
+            <div class="chip"><img src="./assets/brand/genie-icon-full-color.svg" alt="">Genie over the lakehouse</div>
+          </div>
+          <div class="bcell"><span class="cbadge navy">Context</span></div>
+        </div>
+        <div class="pband gov">
+          <div><div class="plabel">Unified governance</div><div class="psub">one model for data + AI</div></div>
+          <div class="pchips">
+            <div class="chip"><img src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">Unity Catalog</div>
+            <div class="chip"><img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">Unity AI Gateway</div>
+          </div>
+          <div class="bcell"><span class="cbadge">Control</span><span class="cbadge">Cost</span></div>
+        </div>
+        <div class="pband">
+          <div><div class="plabel">Agentic data</div><div class="psub">ingest · analytics · transactions</div></div>
+          <div class="pchips">
+            <div class="chip"><img src="./assets/brand/lakeflow-icon-full-color.svg" alt="">Lakeflow</div>
+            <div class="chip"><img src="./assets/brand/lakehouse-icon-full-color.svg" alt="">Lakehouse</div>
+            <div class="chip"><img src="./assets/brand/lakebase-icon-full-color.svg" alt="">Lakebase</div>
+          </div>
+          <div class="bcell"><span class="cbadge ghost">One copy</span></div>
+        </div>
+        <div class="pband">
+          <div><div class="plabel">Open infrastructure</div><div class="psub">open-format data lake</div></div>
+          <div class="pchips">
+            <div class="chip txt">Any cloud</div>
+            <div class="chip txt">Any model</div>
+            <div class="chip txt">Any data</div>
+          </div>
+          <div class="bcell"><span class="cbadge navy">Choice</span></div>
+        </div>
+      </div>
+      <div class="source-line">Every layer NorthPeak's solution touches lives on this one stack: the data, the app, and the AI, governed together.</div>
+    </div>
+  </section>
+
+  <!-- 8 · Three milestones, one system -->
   <section data-label="Three milestones">
     <div class="slide">
       <span class="action-kicker">The build</span>
@@ -295,49 +392,43 @@
     </div>
   </section>
 
-  <!-- 8 · AI spend, shown and bounded -->
+  <!-- 9 · AI spend, shown and bounded -->
   <section data-label="AI spend">
     <div class="slide white">
       <span class="action-kicker">AI spend, shown and bounded</span>
       <div class="action-title" style="margin-top:12px;">You always know what the assistant costs: <span class="em">capped, per-store attributable, ~$200K/yr bounded.</span></div>
       <div class="action-rule"></div>
-      <div style="display:flex;gap:36px;align-items:stretch;flex:1;">
+      <div style="display:flex;gap:34px;align-items:stretch;flex:1;">
         <div class="chartcard" style="flex:1.25;">
           <div class="chart-h">
             <span class="ct">Assistant spend vs. monthly budget cap</span>
-            <span class="cl">Unity AI Gateway</span>
+            <span class="cl"><img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">Unity AI Gateway</span>
           </div>
-          <svg viewBox="0 0 560 240" style="width:100%;height:auto;" role="img" aria-label="Monthly assistant spend held under the budget cap">
-            <!-- gridlines -->
-            <line x1="46" y1="20" x2="540" y2="20" stroke="#E4E2DD" stroke-width="1"/>
-            <line x1="46" y1="70" x2="540" y2="70" stroke="#E4E2DD" stroke-width="1"/>
-            <line x1="46" y1="120" x2="540" y2="120" stroke="#E4E2DD" stroke-width="1"/>
-            <line x1="46" y1="170" x2="540" y2="170" stroke="#E4E2DD" stroke-width="1"/>
-            <line x1="46" y1="200" x2="540" y2="200" stroke="#C9C6C0" stroke-width="1.5"/>
-            <!-- y labels ($K/mo) -->
-            <text x="38" y="24" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">20</text>
-            <text x="38" y="74" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">15</text>
-            <text x="38" y="124" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">10</text>
-            <text x="38" y="174" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">5</text>
-            <text x="38" y="204" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">0</text>
-            <!-- cap line at 16.7K/mo -> y = 200 - (16.7/20*180) = 49.7 -->
-            <line x1="46" y1="50" x2="540" y2="50" stroke="#1B3139" stroke-width="2" stroke-dasharray="6 5"/>
-            <text x="540" y="44" text-anchor="end" font-family="DM Mono, monospace" font-size="11" font-weight="700" fill="#1B3139">cap $16.7K/mo</text>
-            <!-- bars: values in $K -> height = v/20*180, x baseline 200 -->
-            <!-- Mar 11.5 -->
-            <rect x="70"  y="96.5" width="52" height="103.5" rx="4" fill="#FF5F46"/>
-            <rect x="150" y="74"   width="52" height="126"   rx="4" fill="#FF5F46"/>
-            <rect x="230" y="60.5" width="52" height="139.5" rx="4" fill="#FF5F46"/>
-            <rect x="310" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
-            <rect x="390" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
-            <rect x="470" y="56"   width="52" height="144"   rx="4" fill="#FF3621"/>
-            <!-- x labels -->
-            <text x="96"  y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Mar</text>
-            <text x="176" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Apr</text>
-            <text x="256" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">May</text>
-            <text x="336" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jun</text>
-            <text x="416" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jul</text>
-            <text x="496" y="218" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Aug</text>
+          <svg viewBox="0 0 560 236" style="width:100%;height:auto;" role="img" aria-label="Monthly assistant spend held under the budget cap">
+            <line x1="46" y1="18" x2="540" y2="18" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="66" x2="540" y2="66" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="114" x2="540" y2="114" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="162" x2="540" y2="162" stroke="#E4E2DD" stroke-width="1"/>
+            <line x1="46" y1="196" x2="540" y2="196" stroke="#C9C6C0" stroke-width="1.5"/>
+            <text x="38" y="22" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">20</text>
+            <text x="38" y="70" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">15</text>
+            <text x="38" y="118" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">10</text>
+            <text x="38" y="166" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">5</text>
+            <text x="38" y="200" text-anchor="end" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">0</text>
+            <line x1="46" y1="48" x2="540" y2="48" stroke="#1B3139" stroke-width="2" stroke-dasharray="6 5"/>
+            <text x="540" y="42" text-anchor="end" font-family="DM Mono, monospace" font-size="11" font-weight="700" fill="#1B3139">cap $16.7K/mo</text>
+            <rect x="70"  y="94"   width="52" height="102" rx="4" fill="#FF5F46"/>
+            <rect x="150" y="72"   width="52" height="124" rx="4" fill="#FF5F46"/>
+            <rect x="230" y="59"   width="52" height="137" rx="4" fill="#FF5F46"/>
+            <rect x="310" y="54"   width="52" height="142" rx="4" fill="#FF3621"/>
+            <rect x="390" y="54"   width="52" height="142" rx="4" fill="#FF3621"/>
+            <rect x="470" y="54"   width="52" height="142" rx="4" fill="#FF3621"/>
+            <text x="96"  y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Mar</text>
+            <text x="176" y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Apr</text>
+            <text x="256" y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">May</text>
+            <text x="336" y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jun</text>
+            <text x="416" y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Jul</text>
+            <text x="496" y="214" text-anchor="middle" font-family="DM Mono, monospace" font-size="11" fill="#8A8886">Aug</text>
           </svg>
           <div class="tilerow">
             <div class="tile"><div class="tl">Spend to date</div><div class="tn">$118K</div></div>
@@ -346,7 +437,7 @@
             <div class="tile hl"><div class="tl">Cap used</div><div class="tn">59%</div></div>
           </div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:15px;">
           <div class="body" style="font-weight:600;color:var(--db-navy);font-size:19px;">For the AI spend owner, the value is predictability:</div>
           <ul class="bullets">
             <li>A hard budget cap the assistant cannot exceed, with alerts before it approaches.</li>
@@ -359,12 +450,39 @@
     </div>
   </section>
 
-  <!-- 9 · Persona fit -->
+  <!-- 10 · Proof points -->
+  <section data-label="Proof">
+    <div class="slide dark">
+      <img src="./assets/brand/databricks-symbol-white.svg" alt="" style="height:34px;width:auto;align-self:flex-start;opacity:.9;">
+      <span class="eyebrow" style="margin-top:20px;">Proof: enterprises already run agents on Databricks</span>
+      <div class="title" style="margin-top:12px;font-size:42px;max-width:1000px;">This pattern is already delivering, at scale.</div>
+      <div class="proof">
+        <div>
+          <div class="pnum">80%+</div>
+          <div class="pdesc">fewer fraud attacks, with 7x faster model deployment</div>
+          <div class="pwho">AT&amp;T</div>
+        </div>
+        <div>
+          <div class="pnum">$300M</div>
+          <div class="pdesc">revenue growth and a 200% attach-rate increase</div>
+          <div class="pwho">Frontier</div>
+        </div>
+        <div>
+          <div class="pnum">40%</div>
+          <div class="pdesc">faster time-to-answer, with a 30% productivity boost</div>
+          <div class="pwho">Vodafone</div>
+        </div>
+      </div>
+      <div class="source-line">Real-time agents on governed enterprise data, the same architecture behind NorthPeak Store Ops.</div>
+    </div>
+  </section>
+
+  <!-- 11 · Persona fit -->
   <section data-label="Persona fit">
     <div class="slide">
       <span class="eyebrow">Built for the two people in the room</span>
-      <div class="title" style="margin-top:12px;font-size:44px;">What each of you gets.</div>
-      <div class="persona" style="flex:1;">
+      <div class="title" style="margin-top:12px;font-size:42px;">What each of you gets.</div>
+      <div class="persona">
         <div class="pcol">
           <div class="prole" style="color:var(--db-lava);">The executive</div>
           <div class="pname">Dana Ruiz<br>SVP Retail Operations</div>
@@ -390,14 +508,14 @@
     </div>
   </section>
 
-  <!-- 10 · Live demo + next steps -->
+  <!-- 12 · Live demo + next steps -->
   <section data-label="Live demo">
     <div class="slide dark" style="justify-content:center;">
-      <img src="./assets/brand/databricks-logo-white.svg" alt="Databricks" style="height:26px;width:auto;align-self:flex-start;margin-bottom:30px;">
+      <img src="./assets/brand/databricks-logo-white.svg" alt="Databricks" style="height:26px;width:auto;align-self:flex-start;margin-bottom:28px;">
       <span class="eyebrow">Live demo</span>
-      <div class="title" style="margin-top:12px;font-size:56px;">Let's watch Store 214 recover, live.</div>
+      <div class="title" style="margin-top:12px;font-size:54px;">Let's watch Store 214 recover, live.</div>
       <div class="subtitle" style="margin-top:18px;max-width:820px;">See it, ask why, get the move, act, all on one governed platform: the map lights up, Genie explains the shortfall, the transfer is ranked and approved, and the KPIs move, with every AI call capped and logged.</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-top:36px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-top:34px;">
         <div class="accent-bar"></div>
         <span style="font-size:15px;color:#B9C6CB;">Next: pilot the five cold-weather SKUs, then scale the pattern across the catalog · databricks.com</span>
       </div>
