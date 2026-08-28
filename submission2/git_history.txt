@@ -1,4 +1,9 @@
-* c05721c (HEAD -> development, origin/development) submission2: git history snapshot (git_history.txt)
+* cbcc695 (HEAD -> development, origin/development) submission2: refresh git history snapshot (Lakebase Search layer)
+* 202a9ac submission2: Lakebase Search substitute evidence (assist_log + drafted_sample)
+* 3749ede Build 2 - Assist: wire search_products (Lakebase Search) into substitute drafting
+* 2e3f5f9 Build 1 / Task A2: Lakebase Search over app_products (synced) + hybrid search
+* 7781438 Build 1 / Task A1: add raw_products Delta table build script
+* 3fcaee2 submission2: git history snapshot (git_history.txt)
 * 0ecb736 submission2: Build 2 evidence exports (writeback/state/view/assist/drafted/hero)
 * f4466bc chore: Today-tab trim, deploy scripts, session notes
 * 07a79f3 Build 3: OBO scopes for the Unity AI Gateway model service
