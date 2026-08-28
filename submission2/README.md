@@ -17,7 +17,10 @@ the approved transfer back to Postgres with a human in the loop — a decision, 
   (`scheduled_scoring`/`pipeline_update`, priority > a person opening the page).
 - **Assist** — the agent explains why a position is flagged (`find_shortfall`), runs
   what-if scenarios and ranks moves (`rank_recovery_moves`), and auto-drafts the memo.
-  Retrieval is grounded in the Lakebase synced tables (positions/recommendations).
+  For a **substitute** move it calls `search_products` — **hybrid retrieval (BM25 +
+  pgvector ANN, RRF) over the Build-1 Lakebase Search index `northpeak.product_search`**
+  (query embedded with `databricks-gte-large-en`), not a separate vector store — and
+  cites the retrieved candidates in the draft.
 - **Act** — on human approval the agent commits the move to `app.ops_actions`
   (`execute_recovery_action`), logs a **decision** event to `app.workflow_state`
   atomically, and the committed decision shows on the next read of the live view.
@@ -44,7 +47,9 @@ the approved transfer back to Postgres with a human in the loop — a decision, 
   sandbox; the interactions in `assist_log.jsonl` were generated via the direct FMAPI
   fallback (`AGENT_TRANSPORT=chat_completions`, `databricks-claude-sonnet-5`). Default
   transport remains the governed gateway.
-- **Deferred:** Lakebase Search over the product catalog (the `search_products` substitute
-  path). The product catalog table + hybrid index were never built in Build 1 (no
-  `products`/`description` source), so the Assist layer's drafting retrieves from the
-  synced position/recommendation tables rather than a Lakebase Search index.
+- **Lakebase Search (wired):** the substitute path retrieves from the Build-1 hybrid
+  index `northpeak.product_search` (405 products, `gte-large-en` embeddings, BM25 +
+  pgvector ANN fused with RRF). See the `substitute_draft_lakebase_search` run in
+  `assist_log.jsonl` (with the retrieved candidates) and the substitute memo in
+  `drafted_sample.md`. Tool: `app/server/agent/tools/search.ts`; reference/CLI +
+  index build live under Build 1 (`app/scripts/search_products.py`).
