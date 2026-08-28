@@ -1,0 +1,185 @@
+[
+  {
+    "id": "7ae8e38c-3245-4874-b20f-3716831f59cf",
+    "event_type": "decision",
+    "source": "reorder",
+    "priority": 50,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": "e723c47f-cfa1-4ab9-b05f-b84aa162d461",
+    "status": "approved",
+    "score": null,
+    "payload": {
+      "units": 144,
+      "move_type": "reorder",
+      "approved_by": "jonathan.whiteley@databricks.com",
+      "drafted_request": "Reorder 144 units of Summit Down Parka \u2014 expedite from DC to refill STORE-0034",
+      "source_store_id": null,
+      "predicted_recaptured_usd": null
+    },
+    "created_at": "2026-08-27T20:43:55.098198+00:00"
+  },
+  {
+    "id": "85e86f83-8425-4938-8b2d-303f8c04f6bd",
+    "event_type": "decision",
+    "source": "reorder",
+    "priority": 50,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": "c7d41d52-f245-499b-ae95-df2ec06481fe",
+    "status": "approved",
+    "score": null,
+    "payload": {
+      "units": 420,
+      "move_type": "reorder",
+      "approved_by": "jonathan.whiteley@databricks.com",
+      "drafted_request": "Reorder 420 units of Summit Down Parka \u2014 expedite from DC to refill STORE-0034",
+      "source_store_id": null,
+      "predicted_recaptured_usd": null
+    },
+    "created_at": "2026-08-27T20:50:56.991074+00:00"
+  },
+  {
+    "id": "b2f4d4e7-6ad6-4883-a26d-5cc7577f9c19",
+    "event_type": "trigger",
+    "source": "scheduled_scoring",
+    "priority": 100,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "scheduled_scoring",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:04:13.559566+00:00"
+  },
+  {
+    "id": "0df209db-4b7c-422b-b6d7-2673d7e75eb9",
+    "event_type": "trigger",
+    "source": "pipeline_update",
+    "priority": 90,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "pipeline_update",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:04:42.562831+00:00"
+  },
+  {
+    "id": "f1f28e8d-ec4a-42f4-b0f5-55195a948d20",
+    "event_type": "trigger",
+    "source": "scheduled_scoring",
+    "priority": 100,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "scheduled_scoring",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:04:43.188605+00:00"
+  },
+  {
+    "id": "7ca93ebd-122c-4c28-b4c4-74389a58987e",
+    "event_type": "trigger",
+    "source": "user_open",
+    "priority": 10,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "user_open",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:04:43.781102+00:00"
+  },
+  {
+    "id": "c8da4b11-b066-48ce-a5c8-d59c76fef5f2",
+    "event_type": "trigger",
+    "source": "scheduled_scoring",
+    "priority": 100,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "scheduled_scoring",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:09:25.83696+00:00"
+  },
+  {
+    "id": "1626d5e4-3038-49c4-a38f-cab6156651c8",
+    "event_type": "trigger",
+    "source": "scheduled_scoring",
+    "priority": 100,
+    "entity_ref": "STORE-0034:SKU-APP-04412",
+    "action_id": null,
+    "status": null,
+    "score": 76834.28358000002,
+    "payload": {
+      "note": "Scheduled re-score of the live shortfall view; system-driven, no human open required.",
+      "trigger": "scheduled_scoring",
+      "schedule": "*/30 * * * *",
+      "top_entity": "STORE-0034:SKU-APP-04412",
+      "scored_rows": 150,
+      "open_shortfalls": 150,
+      "top_exposure_usd": 76834.28358000002,
+      "total_exposure_usd": 4324765.737899999
+    },
+    "created_at": "2026-08-27T21:13:40.060426+00:00"
+  },
+  {
+    "id": "5034cfc9-9c42-479a-9b1f-eaa495fcfc00",
+    "event_type": "decision",
+    "source": "transfer",
+    "priority": 50,
+    "entity_ref": "STORE-0214:SKU-APP-04412",
+    "action_id": "7a81e5a4-c6f0-4f25-a1d7-63b0abb77f01",
+    "status": "approved",
+    "score": 23978.7,
+    "payload": {
+      "units": 107,
+      "move_type": "transfer",
+      "approved_by": "jonathan.whiteley@databricks.com",
+      "drafted_request": "Transfer 107 units of Summit Down Parka (SKU-APP-04412) from STORE-0377 (Denver-area surplus, 833 on-hand, 99.9km away) to STORE-0214 (Denver, 0 on-hand, $56.6K lost-sales exposure). This is the ML-recommended recovery move, predicted to recapture $23,978.70 (net $23,808.79) \u2014 highest value option vs. expedite/substitute. Please prioritize pick/pack and set markdown-hold on remaining STORE-0377 surplus of this SKU.",
+      "source_store_id": "STORE-0377",
+      "predicted_recaptured_usd": 23978.7
+    },
+    "created_at": "2026-08-27T21:15:34.909247+00:00"
+  }
+]

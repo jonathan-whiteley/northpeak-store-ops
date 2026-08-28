@@ -1,0 +1,65 @@
+HERO QUESTION
+=============
+"Store 214 (Denver) is out of the Summit Down Parka in the middle of a cold snap.
+ Why is it out, what's the best recovery move, and can you make it happen?"
+
+The app answers this as a DECISION, not a lookup: it surfaces the shortfall
+(Visualize), prescribes the ranked recovery move and drafts the memo (Assist),
+and commits the approved transfer back to Postgres with a human in the loop
+(Act) — then the committed decision shows up on the next read (closed loop).
+
+Hero entity: STORE-0214 x SKU-APP-04412 (Summit Down Parka)
+
+
+DECISION CHAIN (linked record IDs across the exports)
+=====================================================
+Read top-to-bottom; each row links to the next by the id in [brackets].
+
+1. TRIGGER  (state_table.json)
+   A scheduled/system re-score of the live view surfaced the open shortfalls
+   without anyone opening the page.
+     workflow_state.id ........ 1626d5e4-3038-49c4-a38f-cab6156651c8
+     event_type ............... trigger
+     source / priority ........ scheduled_scoring / 100  (outranks user_open=10)
+
+2. LIVE VIEW  (view_result.json  <-  view_query.sql)
+   The ranked, flagged queue. The hero row:
+     id ....................... STORE-0214:SKU-APP-04412
+     position_status .......... at_risk / stockout  (the flag)
+     lost_sales_exposure_usd .. ~56,559  (the rank key)
+   Source table (read-only synced UC): northpeak.app_store_sku_position
+   Shortfall detail (read-only synced UC): northpeak.app_open_shortfalls
+     (store_id=STORE-0214, product_id=SKU-APP-04412,
+      nearest_surplus_store_id=STORE-0377)
+
+3. ML RECOMMENDATION  (read-only synced UC: northpeak.app_recovery_recommendations)
+   The model's ranked move for STORE-0214:SKU-APP-04412:
+     recommended_move ......... transfer
+     source store ............. STORE-0377
+     recommended_units ........ 107
+     predicted_recaptured_usd . 23,978.70   (net 23,808.79)
+
+4. ASSIST  (assist_log.jsonl)
+   conversation_id .......... 1528ae59-76f0-4c8f-81b5-a5ade7e84c8a
+   runs: explanation -> draft -> what_if (40 units) -> act
+   tools used: ask_data (Genie), find_shortfall, rank_recovery_moves,
+               execute_recovery_action
+   The drafted memo is drafted_sample.md.
+
+5. WRITEBACK / ACT  (writeback_table.json  — writable Postgres app.ops_actions)
+   On human approval ("Approved. Record the transfer.") the agent committed:
+     ops_actions.id (transfer) ...... 7a81e5a4-c6f0-4f25-a1d7-63b0abb77f01
+       store_id=STORE-0214, source_store_id=STORE-0377, units=107,
+       status=approved, approver=jonathan.whiteley@databricks.com
+     ops_actions.id (markdown_hold) . 4c44e286-7cab-4c1b-84a1-727a51c287e6
+       paired hold on the STORE-0377 surplus so it isn't discounted while it
+       feeds the transfer (same transaction).
+
+6. DECISION EVENT  (state_table.json)  — closes the loop
+     workflow_state.id ........ 5034cfc9-9c42-479a-9b1f-eaa495fcfc00
+     event_type ............... decision
+     action_id ................ 7a81e5a4-c6f0-4f25-a1d7-63b0abb77f01  (-> step 5)
+     entity_ref ............... STORE-0214:SKU-APP-04412
+   Logged atomically with the write by app code (logDecision inside the
+   recordRecoveryAction transaction). On the next read of the live view the
+   hero row now carries live_move_type=transfer / action_status=approved.

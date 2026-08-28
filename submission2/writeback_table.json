@@ -1,0 +1,94 @@
+[
+  {
+    "id": "e723c47f-cfa1-4ab9-b05f-b84aa162d461",
+    "store_id": "STORE-0034",
+    "product_id": "SKU-APP-04412",
+    "move_type": "reorder",
+    "source_store_id": null,
+    "units": 144,
+    "proposed_action": "Reorder 144 units of Summit Down Parka \u2014 expedite from DC to refill STORE-0034",
+    "predicted_recaptured_usd": null,
+    "approval_status": "approved",
+    "approver": "jonathan.whiteley@databricks.com",
+    "audit_trail": [
+      {
+        "at": "2026-08-27T20:43:55.100Z",
+        "by": "jonathan.whiteley@databricks.com",
+        "tool": "reorder",
+        "notes": "Reorder released",
+        "action": "approved"
+      }
+    ],
+    "created_at": "2026-08-27T20:43:55.098198+00:00",
+    "committed_at": "2026-08-27T20:43:55.098198+00:00"
+  },
+  {
+    "id": "c7d41d52-f245-499b-ae95-df2ec06481fe",
+    "store_id": "STORE-0034",
+    "product_id": "SKU-APP-04412",
+    "move_type": "reorder",
+    "source_store_id": null,
+    "units": 420,
+    "proposed_action": "Reorder 420 units of Summit Down Parka \u2014 expedite from DC to refill STORE-0034",
+    "predicted_recaptured_usd": null,
+    "approval_status": "approved",
+    "approver": "jonathan.whiteley@databricks.com",
+    "audit_trail": [
+      {
+        "at": "2026-08-27T20:50:56.992Z",
+        "by": "jonathan.whiteley@databricks.com",
+        "tool": "reorder",
+        "notes": "Reorder released",
+        "action": "approved"
+      }
+    ],
+    "created_at": "2026-08-27T20:50:56.991074+00:00",
+    "committed_at": "2026-08-27T20:50:56.991074+00:00"
+  },
+  {
+    "id": "7a81e5a4-c6f0-4f25-a1d7-63b0abb77f01",
+    "store_id": "STORE-0214",
+    "product_id": "SKU-APP-04412",
+    "move_type": "transfer",
+    "source_store_id": "STORE-0377",
+    "units": 107,
+    "proposed_action": "Transfer 107 units of Summit Down Parka (SKU-APP-04412) from STORE-0377 (Denver-area surplus, 833 on-hand, 99.9km away) to STORE-0214 (Denver, 0 on-hand, $56.6K lost-sales exposure). This is the ML-recommended recovery move, predicted to recapture $23,978.70 (net $23,808.79) \u2014 highest value option vs. expedite/substitute. Please prioritize pick/pack and set markdown-hold on remaining STORE-0377 surplus of this SKU.",
+    "predicted_recaptured_usd": 23978.7,
+    "approval_status": "approved",
+    "approver": "jonathan.whiteley@databricks.com",
+    "audit_trail": [
+      {
+        "at": "2026-08-27T21:15:34.833Z",
+        "by": "jonathan.whiteley@databricks.com",
+        "tool": "execute_recovery_action",
+        "notes": "Recovery move recorded",
+        "action": "approved"
+      }
+    ],
+    "created_at": "2026-08-27T21:15:34.909247+00:00",
+    "committed_at": "2026-08-27T21:15:34.909247+00:00"
+  },
+  {
+    "id": "4c44e286-7cab-4c1b-84a1-727a51c287e6",
+    "store_id": "STORE-0377",
+    "product_id": "SKU-APP-04412",
+    "move_type": "markdown_hold",
+    "source_store_id": null,
+    "units": 0,
+    "proposed_action": "Markdown hold on surplus feeding STORE-0214 transfer",
+    "predicted_recaptured_usd": null,
+    "approval_status": "approved",
+    "approver": "jonathan.whiteley@databricks.com",
+    "audit_trail": [
+      {
+        "at": "2026-08-27T21:15:34.833Z",
+        "by": "jonathan.whiteley@databricks.com",
+        "tool": "execute_recovery_action",
+        "notes": "Markdown hold on surplus feeding STORE-0214 transfer",
+        "action": "markdown_hold"
+      }
+    ],
+    "created_at": "2026-08-27T21:15:34.909247+00:00",
+    "committed_at": "2026-08-27T21:15:34.909247+00:00"
+  }
+]
