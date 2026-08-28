@@ -134,8 +134,9 @@ function makeTools(ctx: AgentContext): Tool[] {
 
   // ── find_shortfall — TRAINEE BUILDS (Build 2 · Assist). STUB. ─────────────
   // TODO — BUILD 2 (trainee): implement this. Read the open shortfall for
-  // {store_id, product_id} (or the worst one) from Lakebase app.open_shortfalls
-  // + app.store_sku_position: on_hand, recent velocity, weeks_of_supply,
+  // {store_id, product_id} (or the worst one) from Lakebase synced tables
+  // northpeak.app_open_shortfalls + northpeak.app_store_sku_position: on_hand,
+  // recent velocity, weeks_of_supply,
   // lost-sales exposure, AND the nearest surplus store + its on-hand + distance.
   // Helper queries are READY in server/db/queries/stores.ts: `getShortfall`,
   // `worstShortfall`, `getPosition`. See APP_WORKSHOP.md → "Layer 2 — Assist".
@@ -185,7 +186,8 @@ function makeTools(ctx: AgentContext): Tool[] {
   });
 
   // ── rank_recovery_moves — TRAINEE BUILDS (Build 2 · Assist). STUB. ────────
-  // TODO — BUILD 2 (trainee): implement this. Read app.recovery_recommendations
+  // TODO — BUILD 2 (trainee): implement this. Read the synced table
+  // northpeak.app_recovery_recommendations
   // for {store_id, product_id} and return the model's recommended_move,
   // predicted_recaptured_usd, predicted_net_value_usd, and the full move_ranking
   // (all three options with predicted recaptured $ + net $ + cost). This is the
@@ -196,7 +198,7 @@ function makeTools(ctx: AgentContext): Tool[] {
   const rankRecoveryMoves = tool({
     name: 'rank_recovery_moves',
     description:
-      "Read the ML recovery model's ranked moves for a store×SKU from Lakebase app.recovery_recommendations: the recommended move, its predicted recaptured $ + net value, and the full ranking of all three options (transfer / expedite / substitute) with each option's units, cost, predicted recaptured $ and net $. Read-only. Quote these in the draft; do the what-if arithmetically from the ranking.",
+      "Read the ML recovery model's ranked moves for a store×SKU from Lakebase northpeak.app_recovery_recommendations: the recommended move, its predicted recaptured $ + net value, and the full ranking of all three options (transfer / expedite / substitute) with each option's units, cost, predicted recaptured $ and net $. Read-only. Quote these in the draft; do the what-if arithmetically from the ranking.",
     parameters: z.object({
       store_id: z.string().describe('Store id, e.g. STORE-0214.'),
       product_id: z.string().describe('SKU, e.g. SKU-APP-04412.'),
@@ -310,13 +312,32 @@ function makeTools(ctx: AgentContext): Tool[] {
 export async function configureAgentsSdk(ctx: AgentContext): Promise<void> {
   const headers = await authHeaders(ctx.req);
   const bearer = headers.get('Authorization')?.replace(/^Bearer /, '') ?? '';
+  // Transport select. DEFAULT = 'responses' against the Unity AI Gateway
+  // model service (Build 3, governed + budgeted). Set AGENT_TRANSPORT=
+  // chat_completions to fall back to the plain /serving-endpoints FMAPI
+  // Anthropic passthrough (e.g. when the gateway's spend budget is
+  // exhausted) — pair it with AGENT_MODEL=<serving-endpoint-name>. The
+  // fetch shim below strips the fields that passthrough rejects, so both
+  // transports share one client.
+  const useChatCompletions =
+    (process.env.AGENT_TRANSPORT ?? 'responses').toLowerCase().startsWith('chat');
+  const baseURL = useChatCompletions
+    ? `${ctx.databricksHost}/serving-endpoints`
+    : `${ctx.databricksHost}/ai-gateway/mlflow/v1`;
   // Custom fetch: fresh TCP connection per call (avoids the stale-socket 502
   // after a long ask_data hop) + strip the >64-char `input[*].id` the SDK
   // echoes back on round 2 (Databricks' Responses API rejects long ids and
   // the streaming gateway masks the 400 as a bare 502). See git history.
   const client = new OpenAI({
     apiKey: bearer,
-    baseURL: `${ctx.databricksHost}/serving-endpoints`,
+    // Unity AI Gateway model-service base. The service
+    // (northpeak_ops.inference.wishcraft-northpeak-llm) is invoked at
+    // {host}/ai-gateway/mlflow/v1/responses — NOT the plain /serving-endpoints
+    // route (which 404s for gateway model services). The OpenAI SDK appends
+    // `/responses` to this baseURL once setOpenAIAPI('responses') is set below.
+    // (When AGENT_TRANSPORT=chat_completions, baseURL is the /serving-endpoints
+    // FMAPI base instead and the SDK appends `/chat/completions`.)
+    baseURL,
     maxRetries: 4,
     fetch: async (input, init) => {
       const headers = new Headers(init?.headers);
@@ -436,13 +457,14 @@ export async function configureAgentsSdk(ctx: AgentContext): Promise<void> {
     },
   });
   setDefaultOpenAIClient(client);
-  // Use Chat Completions, NOT the Responses API. This app runs on Claude
-  // (databricks-claude-sonnet-5); Databricks' Responses API passthrough 400s
-  // for Anthropic models, while Chat Completions streams tool calls +
-  // reasoning for Claude (verified). The `input[*].id` stripping in the fetch
-  // shim above is Responses-specific and simply goes inert on the `messages`
-  // payload chat-completions sends.
-  setOpenAIAPI('chat_completions');
+  // Use the Responses API against the Unity AI Gateway model service. The
+  // gateway's /ai-gateway/mlflow/v1/responses endpoint DOES support the
+  // Responses shape with streaming tool calls for Claude (verified end-to-end
+  // against northpeak_ops.inference.wishcraft-northpeak-llm) — unlike the plain
+  // /serving-endpoints Anthropic passthrough, which 400s on Responses (the
+  // reason earlier builds used chat_completions). The `input[*].id` stripping
+  // in the fetch shim above is Responses-specific and is now active again.
+  setOpenAIAPI(useChatCompletions ? 'chat_completions' : 'responses');
   setTracingDisabled(true); // disable OpenAI's tracing backend; we use MLflow
 }
 
