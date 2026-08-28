@@ -61,9 +61,9 @@
   .farr{display:flex;align-items:center;justify-content:center;width:28px;color:var(--db-coral);font-size:22px;font-weight:700;flex:none;}
   /* 4 C's cards */
   .cc4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:auto;margin-bottom:4px;}
-  .cc4 .cx{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.15);border-radius:13px;padding:20px 18px;display:flex;flex-direction:column;gap:10px;}
-  .cc4 .cx img{width:38px;height:38px;}
-  .cc4 .cxh{font-size:22px;font-weight:700;color:#fff;}
+  .cc4 .cx{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.15);border-radius:13px;padding:20px 18px;display:flex;flex-direction:column;gap:9px;}
+  .cc4 .cxn{font-family:var(--font-mono);font-size:15px;font-weight:500;color:#FFC9BF;letter-spacing:.04em;}
+  .cc4 .cxh{font-size:22px;font-weight:700;color:#fff;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.14);}
   .cc4 .cxs{font-size:14px;font-style:italic;line-height:1.35;color:#9FB0B6;}
   .cc4 .cxd{font-size:14.5px;line-height:1.42;color:#DCE4E7;}
   .cc4 .cxd b{color:#FFC9BF;font-weight:700;font-style:normal;}
@@ -233,22 +233,22 @@
       <div class="action-rule"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         <div class="card">
-          <img class="pico" src="./assets/brand/genie-icon-full-color.svg" alt="">
+          <div class="accent-bar"></div>
           <div class="ct" style="color:var(--db-lava);">Revenue</div>
           <div class="cb">Recapture lost sales on stocked-out SKUs by moving inventory to where demand is climbing, before the season passes.</div>
         </div>
         <div class="card">
-          <img class="pico" src="./assets/brand/lakebase-icon-full-color.svg" alt="">
+          <div class="accent-bar"></div>
           <div class="ct" style="color:var(--db-lava);">Cost</div>
           <div class="cb">Stop the markdown clock on dead stock in the South before margin erodes; hold price while stock moves.</div>
         </div>
         <div class="card">
-          <img class="pico" src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">
+          <div class="accent-bar"></div>
           <div class="ct" style="color:var(--db-lava);">Risk</div>
           <div class="cb">Every recommendation, write-back, and AI call is governed and audited in Unity Catalog: one permission model.</div>
         </div>
         <div class="card">
-          <img class="pico" src="./assets/brand/lakeflow-icon-full-color.svg" alt="">
+          <div class="accent-bar"></div>
           <div class="ct" style="color:var(--db-lava);">Speed</div>
           <div class="cb">A ranked, approvable recovery move in minutes, closing the gap the batch replenishment cycle leaves open.</div>
         </div>
@@ -264,25 +264,25 @@
       <div class="subtitle" style="margin-top:12px;max-width:940px;">It takes Context, Control, Cost, and Choice: the four things NorthPeak's assistant has to get right, and the four Databricks was built to solve.</div>
       <div class="cc4">
         <div class="cx">
-          <img src="./assets/brand/genie-icon-full-color.svg" alt="">
+          <div class="cxn">01</div>
           <div class="cxh">Context</div>
           <div class="cxs">"Connecting AI to data is difficult."</div>
           <div class="cxd"><b>NorthPeak:</b> the assistant answers over the governed lakehouse, not a stale copy.</div>
         </div>
         <div class="cx">
-          <img src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">
+          <div class="cxn">02</div>
           <div class="cxh">Control</div>
           <div class="cxs">"Controlling AI and data use is required."</div>
           <div class="cxd"><b>NorthPeak:</b> one permission model spans the data, the app's writes, and every AI call.</div>
         </div>
         <div class="cx">
-          <img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">
+          <div class="cxn">03</div>
           <div class="cxh">Cost</div>
           <div class="cxs">"Optimizing cost is becoming essential."</div>
           <div class="cxd"><b>NorthPeak:</b> Unity AI Gateway caps and meters assistant spend, per store.</div>
         </div>
         <div class="cx">
-          <img src="./assets/brand/lakehouse-icon-full-color.svg" alt="">
+          <div class="cxn">04</div>
           <div class="cxh">Choice</div>
           <div class="cxs">"Avoiding lock-in is key for innovation."</div>
           <div class="cxd"><b>NorthPeak:</b> open formats and model choice keep the platform free of lock-in.</div>
@@ -303,7 +303,7 @@
           <div class="pchips">
             <div class="chip"><img src="./assets/brand/genie-icon-full-color.svg" alt="">Genie</div>
             <div class="chip"><img src="./assets/brand/agent-bricks-icon-full-color.svg" alt="">Agent Bricks</div>
-            <div class="chip"><img src="./assets/brand/apps-icon-full-color.svg" alt="">Store Ops App</div>
+            <div class="chip"><img src="./assets/brand/apps-icon-full-color.svg" alt="">Databricks Apps</div>
           </div>
           <div class="bcell"><span class="cbadge ghost">AI coworkers</span></div>
         </div>
@@ -318,7 +318,7 @@
           <div><div class="plabel">Unified governance</div><div class="psub">one model for data + AI</div></div>
           <div class="pchips">
             <div class="chip"><img src="./assets/brand/unity-catalog-icon-full-color.svg" alt="">Unity Catalog</div>
-            <div class="chip"><img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">Unity AI Gateway</div>
+            <div class="chip">Unity AI Gateway</div>
           </div>
           <div class="bcell"><span class="cbadge">Control</span><span class="cbadge">Cost</span></div>
         </div>
@@ -402,7 +402,7 @@
         <div class="chartcard" style="flex:1.25;">
           <div class="chart-h">
             <span class="ct">Assistant spend vs. monthly budget cap</span>
-            <span class="cl"><img src="./assets/brand/mosaic-ai-icon-full-color.svg" alt="">Unity AI Gateway</span>
+            <span class="cl">Governed by Unity AI Gateway</span>
           </div>
           <svg viewBox="0 0 560 236" style="width:100%;height:auto;" role="img" aria-label="Monthly assistant spend held under the budget cap">
             <line x1="46" y1="18" x2="540" y2="18" stroke="#E4E2DD" stroke-width="1"/>

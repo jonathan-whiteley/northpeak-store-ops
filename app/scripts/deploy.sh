@@ -101,10 +101,28 @@ fi
 
 # 1) Upload source. Delete the upload dir (not the app) and re-import —
 #    `--overwrite` alone doesn't prune removed/renamed files.
-echo "[deploy] uploading source to $WS_PATH"
+#
+#    CRITICAL: never ship node_modules (~750M). The Apps container runs its
+#    own `npm install` from the uploaded package-lock.json, so uploading
+#    node_modules just balloons the import from ~1min to ~5-8min for files the
+#    container ignores. `workspace import-dir` has no exclude flag, so stage a
+#    filtered copy (via rsync) and import THAT. Also drop .env (local profile/
+#    secrets — the container uses app.yaml env + resource bindings) and .git.
+#    KEEP dist/ (container runs `node dist/server.js`) and drizzle/ (migrations
+#    must ship — runMigrations() 503s without them).
+echo "[deploy] uploading source to $WS_PATH (excluding node_modules/.git/.env)"
 databricks workspace delete "$WS_PATH" --recursive ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"} 2>/dev/null || true
 databricks workspace mkdirs "$WS_PATH" ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"}
-if ! err="$(databricks workspace import-dir . "$WS_PATH" ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"} 2>&1 1>/dev/null)"; then
+STAGE_DIR="$(mktemp -d)"
+trap 'rm -rf "$STAGE_DIR"' EXIT
+rsync -a \
+    --exclude='node_modules' \
+    --exclude='.git' \
+    --exclude='.env' \
+    --exclude='.databricks' \
+    --exclude='*.bak' \
+    ./ "$STAGE_DIR/"
+if ! err="$(databricks workspace import-dir "$STAGE_DIR" "$WS_PATH" ${PROFILE_FLAG[@]+"${PROFILE_FLAG[@]}"} 2>&1 1>/dev/null)"; then
     echo "[deploy] ERROR (upload): $err" >&2
     exit 1
 fi

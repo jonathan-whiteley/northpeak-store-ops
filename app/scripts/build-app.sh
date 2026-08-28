@@ -38,10 +38,7 @@ echo "[build-app] generating Drizzle migrations (db:generate)…"
 npm run db:generate
 
 echo "[build-app] building server + client…"
-# NB: call build:server + build:client directly (not `npm run build`) so npm's
-# `prebuild` hook (appkit sync + typegen --wait) does NOT fire — db:generate is
-# already run above and typegen isn't needed for a deploy build.
-npm run build:server && npm run build:client
+npm run build:source
 
 # Rewrite ANY Databricks npm-proxy URL → public registry, in place. The App
 # container can't reach the internal proxy, and different dev environments pin
