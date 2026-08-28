@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import type { AppDb } from '../index.js';
 import type { AuditEntry, MoveOption } from '../schema.js';
+import { logDecision } from './workflow.js';
 
 export type { AuditEntry, MoveOption };
 
@@ -177,7 +178,8 @@ export async function listPositions(
 
   const result = await db.execute(sql`
     SELECT
-      p.id, p.store_id, p.store_name, p.region, p.climate_zone, p.city,
+      p.store_id || ':' || p.product_id AS id,
+      p.store_id, p.store_name, p.region, p.climate_zone, p.city,
       p.store_lat, p.store_lng, p.product_id, p.product_name, p.category,
       p.seasonality, p.on_hand_units, p.on_order_units, p.recent_units_7d,
       p.avg_daily_velocity, p.weeks_of_supply, p.price_usd,
@@ -187,8 +189,8 @@ export async function listPositions(
       rr.predicted_recaptured_usd,
       la.move_type AS live_move_type,
       la.status AS action_status
-    FROM app.store_sku_position p
-    LEFT JOIN app.recovery_recommendations rr
+    FROM northpeak.app_store_sku_position p
+    LEFT JOIN northpeak.app_recovery_recommendations rr
       ON rr.store_id = p.store_id AND rr.product_id = p.product_id
     LEFT JOIN LATERAL (
       SELECT a.move_type, a.status
@@ -211,7 +213,8 @@ export async function getPosition(
 ): Promise<PositionRow | null> {
   const result = await db.execute(sql`
     SELECT
-      p.id, p.store_id, p.store_name, p.region, p.climate_zone, p.city,
+      p.store_id || ':' || p.product_id AS id,
+      p.store_id, p.store_name, p.region, p.climate_zone, p.city,
       p.store_lat, p.store_lng, p.product_id, p.product_name, p.category,
       p.seasonality, p.on_hand_units, p.on_order_units, p.recent_units_7d,
       p.avg_daily_velocity, p.weeks_of_supply, p.price_usd,
@@ -221,8 +224,8 @@ export async function getPosition(
       rr.predicted_recaptured_usd,
       la.move_type AS live_move_type,
       la.status AS action_status
-    FROM app.store_sku_position p
-    LEFT JOIN app.recovery_recommendations rr
+    FROM northpeak.app_store_sku_position p
+    LEFT JOIN northpeak.app_recovery_recommendations rr
       ON rr.store_id = p.store_id AND rr.product_id = p.product_id
     LEFT JOIN LATERAL (
       SELECT a.move_type, a.status
@@ -232,7 +235,7 @@ export async function getPosition(
       ORDER BY a.created_at DESC
       LIMIT 1
     ) la ON true
-    WHERE p.id = ${id}
+    WHERE p.store_id || ':' || p.product_id = ${id}
     LIMIT 1
   `);
   const row = result.rows[0] as PositionSqlRow | undefined;
@@ -263,7 +266,7 @@ export async function getShortfall(
     SELECT store_id, product_id, on_hand_units, avg_daily_velocity,
            lost_sales_exposure_usd, nearest_surplus_store_id,
            nearest_surplus_on_hand, nearest_surplus_distance_km
-    FROM app.open_shortfalls
+    FROM northpeak.app_open_shortfalls
     WHERE store_id = ${storeId} AND product_id = ${productId}
     LIMIT 1
   `);
@@ -303,7 +306,7 @@ export async function worstShortfall(db: AppDb): Promise<Shortfall | null> {
     SELECT store_id, product_id, on_hand_units, avg_daily_velocity,
            lost_sales_exposure_usd, nearest_surplus_store_id,
            nearest_surplus_on_hand, nearest_surplus_distance_km
-    FROM app.open_shortfalls
+    FROM northpeak.app_open_shortfalls
     ORDER BY lost_sales_exposure_usd DESC NULLS LAST
     LIMIT 1
   `);
@@ -335,8 +338,8 @@ export async function worstShortfall(db: AppDb): Promise<Shortfall | null> {
 
 // ============================================================================
 // StoreTransferLink — the shortfall→surplus "hero move" arc for the map.
-// Reads app.open_shortfalls (which carries nearest_surplus_store_id), joins
-// app.store_sku_position TWICE for both endpoints' coords, and LEFT JOINs
+// Reads northpeak.app_open_shortfalls (which carries nearest_surplus_store_id), joins
+// northpeak.app_store_sku_position TWICE for both endpoints' coords, and LEFT JOINs
 // recovery_recommendations for the recommended units + predicted recaptured $.
 // Aggregated to ONE arc per (shortfall store → surplus store) pair so the map
 // draws a single weighted line even when several SKUs share the same route.
@@ -368,7 +371,7 @@ export async function storeTransferLinks(
       SELECT store_id,
              MAX(store_lat) AS lat,
              MAX(store_lng) AS lng
-      FROM app.store_sku_position
+      FROM northpeak.app_store_sku_position
       WHERE store_lat IS NOT NULL AND store_lng IS NOT NULL
       GROUP BY store_id
     )
@@ -383,10 +386,10 @@ export async function storeTransferLinks(
       SUM(rr.predicted_recaptured_usd)                 AS recaptured_usd,
       COALESCE(SUM(s.lost_sales_exposure_usd), 0)::float8 AS lost_sales_exposure_usd,
       COUNT(*)::int                                    AS sku_count
-    FROM app.open_shortfalls s
+    FROM northpeak.app_open_shortfalls s
     JOIN store_coords sc ON sc.store_id = s.store_id
     JOIN store_coords ss ON ss.store_id = s.nearest_surplus_store_id
-    LEFT JOIN app.recovery_recommendations rr
+    LEFT JOIN northpeak.app_recovery_recommendations rr
       ON rr.store_id = s.store_id AND rr.product_id = s.product_id
     WHERE s.nearest_surplus_store_id IS NOT NULL
     GROUP BY s.store_id, sc.lat, sc.lng, s.nearest_surplus_store_id, ss.lat, ss.lng
@@ -444,7 +447,7 @@ export async function getRecommendation(
     SELECT store_id, product_id, recommended_move, recommended_source_store_id,
            recommended_substitute_product_id, recommended_units,
            predicted_recaptured_usd, predicted_net_value_usd, move_ranking
-    FROM app.recovery_recommendations
+    FROM northpeak.app_recovery_recommendations
     WHERE store_id = ${storeId} AND product_id = ${productId}
     LIMIT 1
   `);
@@ -625,6 +628,20 @@ export async function recordRecoveryAction(
     `);
     const actionId = (primary.rows[0] as { id: string }).id;
 
+    // Observability: record the decision atomically with the write.
+    await logDecision(tx, {
+      actionId,
+      storeId: args.storeId,
+      productId: args.productId,
+      moveType: args.moveType,
+      units: args.units,
+      sourceStoreId: args.sourceStoreId,
+      status: 'approved',
+      predictedRecapturedUsd: args.predictedRecapturedUsd,
+      draftedRequest: args.draftedRequest,
+      approvedBy: args.userEmail,
+    });
+
     let markdownHoldId: string | null = null;
     if (args.moveType === 'transfer' && args.sourceStoreId) {
       const holdNote = `Markdown hold on surplus feeding ${args.storeId} transfer`;
@@ -698,6 +715,19 @@ export async function recordReorder(
       RETURNING id
     `);
     const actionId = (inserted.rows[0] as { id: string }).id;
+    // Observability: record the decision atomically with the write.
+    await logDecision(tx, {
+      actionId,
+      storeId: args.storeId,
+      productId: args.productId,
+      moveType: 'reorder',
+      units: args.units,
+      sourceStoreId: null,
+      status: 'approved',
+      predictedRecapturedUsd: null,
+      draftedRequest,
+      approvedBy: args.userEmail,
+    });
     return { actionId };
   });
 }
@@ -741,7 +771,7 @@ export async function positionSummary(db: AppDb): Promise<PositionSummary> {
       COUNT(*) FILTER (
         WHERE p.position_status IN ('stockout','at_risk') AND a.store_id IS NOT NULL
       )::int AS recoveries_in_progress
-    FROM app.store_sku_position p
+    FROM northpeak.app_store_sku_position p
     LEFT JOIN acted a
       ON a.store_id = p.store_id AND a.product_id = p.product_id
   `);
@@ -823,7 +853,7 @@ export async function storeBreakdown(
           ELSE 3
         END
       ) AS worst_rank
-    FROM app.store_sku_position p
+    FROM northpeak.app_store_sku_position p
     WHERE p.store_lat IS NOT NULL AND p.store_lng IS NOT NULL
       ${whereStatusGroup} ${whereZone}
     GROUP BY p.store_id

@@ -4,3 +4,4 @@
  */
 export * from './chat.js';
 export * from './stores.js';
+export * from './workflow.js';

@@ -275,6 +275,57 @@ export const opsActions = appSchema.table(
 );
 
 // ============================================================================
+// Workflow-state + observability table (the app writes here too)
+//
+// `workflow_state` is the audit spine for the Visualize→Act loop. It records
+// TWO kinds of event, each with a timestamp:
+//   1. `trigger`  — the live shortfall view was (re)scored. A scheduled /
+//      system driver (`scheduled_scoring`, `pipeline_update`) carries a higher
+//      `priority` than a person opening the page (`user_open`): the important
+//      positions surface without a human going to look. The scheduler in
+//      server.ts fires `scoreAndLogTrigger` on an interval.
+//   2. `decision` — one row per committed `ops_actions` row (the approve/act
+//      step), linked by `action_id`, so this table is a standalone record of
+//      what fired and what was decided. `recordRecoveryAction` /
+//      `recordReorder` insert it inside the same transaction as the write.
+// Read-only synced tables can't hold this, so it lives in the writable `app`
+// schema next to `ops_actions`.
+// ============================================================================
+
+export const workflowState = appSchema.table(
+  'workflow_state',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    // 'trigger' (view scored) | 'decision' (action committed).
+    eventType: text('event_type', { enum: ['trigger', 'decision'] }).notNull(),
+    // For triggers: 'scheduled_scoring' | 'pipeline_update' | 'user_open'.
+    // For decisions: the move type ('transfer' | 'reorder' | ...).
+    source: text('source').notNull(),
+    // Higher = more autonomous. Scheduled/system triggers outrank user_open.
+    priority: integer('priority').notNull().default(0),
+    // 'STORE-xxxx:SKU-xxxx' — the top-ranked / decided position.
+    entityRef: text('entity_ref'),
+    // For decisions: the committed app.ops_actions row.
+    actionId: uuid('action_id'),
+    // Snapshot of decision status at record time (proposed/approved/...).
+    status: text('status'),
+    // Priority/severity score for a trigger (top lost-sales exposure $).
+    score: doublePrecision('score'),
+    // For triggers: the scored-view summary + defined schedule; for
+    // decisions: move/units/predicted-recaptured + approver.
+    payload: jsonb('payload').$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('workflow_state_type_idx').on(t.eventType, t.createdAt),
+    index('workflow_state_entity_idx').on(t.entityRef),
+    index('workflow_state_action_idx').on(t.actionId),
+  ],
+);
+
+// ============================================================================
 // JSONB entry shapes
 // ============================================================================
 
