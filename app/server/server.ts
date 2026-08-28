@@ -72,7 +72,7 @@ import * as mlflow from 'mlflow-tracing';
 
 import { createDb } from './db/index.js';
 import { runMigrations } from './db/migrate.js';
-import { syncFromDelta } from './db/sync.js';
+import { scoreAndLogTrigger } from './db/queries/workflow.js';
 import { ensureMlflowExperiment } from './lib/mlflow.js';
 
 import { registerConfigRoutes } from './routes/config.js';
@@ -498,7 +498,7 @@ await createApp({
   registerStoreRoutes(app, { db });
   registerSupplyRoutes(app, { db });
   registerActivityRoutes(app, { db });
-  registerAdminRoutes(app, { db, data: appConfig.data });
+  registerAdminRoutes(app, { db });
 
   // Analytics charts — custom route that substitutes catalog/schema into the
   // SQL (the AppKit analytics plugin can't template identifiers). Served at
@@ -603,11 +603,31 @@ migrationsReady = (async () => {
   try {
     await runMigrations(db);
     console.log(`[boot +${ms()}] Migrations up to date`);
-    if (appConfig.data) {
-      await syncFromDelta(db, appConfig.data);
-      console.log(`[boot +${ms()}] Delta sync done`);
-    }
+    // No Delta→Lakebase sync: the read-only position/shortfall/recovery data
+    // is served by UC Lakebase Synced Tables (northpeak.app_*), which the app
+    // reads directly. Migrations only manage the app's own writable + chat
+    // tables (app.ops_actions, conversations, messages, feedback).
     migrationsDone = true;
+
+    // Scored trigger (Visualize layer): re-score the live shortfall view on a
+    // schedule and log a `trigger` event to app.workflow_state, so the top
+    // positions surface without a human opening the page (a scheduled/system
+    // trigger outranks a user_open). Fire once at boot, then every 30 min.
+    const SCORE_INTERVAL_MS = 30 * 60 * 1000;
+    const runScore = () =>
+      scoreAndLogTrigger(db, 'scheduled_scoring')
+        .then((ev) =>
+          ev
+            ? console.log(
+                `[trigger] scored live view — top ${ev.entityRef} $${Math.round(ev.score ?? 0)} exposure`,
+              )
+            : undefined,
+        )
+        .catch((e) => console.warn('[trigger] scoring run failed:', (e as Error).message));
+    void runScore();
+    const scoreTimer = setInterval(runScore, SCORE_INTERVAL_MS);
+    // Don't keep the event loop alive just for the scorer.
+    if (typeof scoreTimer.unref === 'function') scoreTimer.unref();
   } catch (e) {
     // Real bug — the LLM customizing the template needs to act on this.
     // The gate middleware reads `migrationsFailure` and returns it to the
