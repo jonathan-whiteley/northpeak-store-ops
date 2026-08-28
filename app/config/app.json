@@ -20,10 +20,13 @@
   "masEndpointName": "${MAS_ENDPOINT_NAME:}",
   "genieSpaceId":    "${GENIE_SPACE_ID:}",
 
-  // Agent LLM. Runs on Chat Completions (see setOpenAIAPI in storeops.ts), so
-  // Claude works: databricks-claude-sonnet-5 streams tool calls + reasoning.
-  // (The Responses API 400s for Anthropic models, which is why we switched.)
-  "agentModel": "databricks-claude-sonnet-5",
+  // Agent LLM. Routes through the Unity AI Gateway model service (Build 3):
+  // northpeak_ops.inference.wishcraft-northpeak-llm resolves to Claude Sonnet 5
+  // behind a governed endpoint (request/response policy + inference-table
+  // logging). Invoked via the Responses API at {host}/ai-gateway/mlflow/v1
+  // (see configureAgentsSdk in storeops.ts) — the gateway supports streaming
+  // tool calls, unlike the plain /serving-endpoints Anthropic passthrough.
+  "agentModel": "${AGENT_MODEL:northpeak_ops.inference.wishcraft-northpeak-llm}",
 
   // MLflow trace path. Empty → chat shows "Trace pending…". Auto-created at boot.
   "mlflowExperimentId": "",

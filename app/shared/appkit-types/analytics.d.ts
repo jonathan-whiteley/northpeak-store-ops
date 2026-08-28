@@ -39,6 +39,19 @@ declare module "@databricks/appkit-ui/react" {
           position_count: number;
         }>;
       };
+    score_shortfalls: {
+        name: "score_shortfalls";
+        parameters: {
+          /** any - use sql.*() */
+          priority: SQLTypeMarker;
+        };
+        result: unknown;
+      };
+    workflow_state: {
+        name: "workflow_state";
+        parameters: Record<string, never>;
+        result: unknown;
+      };
     worst_shortfalls: {
         name: "worst_shortfalls";
         parameters: {
