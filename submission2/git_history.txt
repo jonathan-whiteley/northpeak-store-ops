@@ -1,0 +1,10 @@
+* c05721c (HEAD -> development, origin/development) submission2: git history snapshot (git_history.txt)
+* 0ecb736 submission2: Build 2 evidence exports (writeback/state/view/assist/drafted/hero)
+* f4466bc chore: Today-tab trim, deploy scripts, session notes
+* 07a79f3 Build 3: OBO scopes for the Unity AI Gateway model service
+* 88e17fd Build 2 - Act: writeback (execute_recovery_action) + atomic decision logging (closed loop)
+* 75ff2fb Build 2 - Assist: agent tools (find_shortfall / rank_recovery_moves), what-if, drafting
+* 185973e Build 2 - Visualize: ranked live view + scored trigger + workflow_state observability
+* b49433b Build 1: read from Lakebase UC synced tables (northpeak.app_*); drop boot Delta sync
+* 6940a0d (origin/main, origin/HEAD, main) Deploy config for northpeak-store-ops Apps deploy
+* 831ab9a Initial commit: NorthPeak Store Ops (Databricks AppKit demo)
