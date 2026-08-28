@@ -59,6 +59,7 @@ import {
 // preserves the template's MAS-OR-Genie flexibility exactly.
 import { callMasEndpoint } from './tools/mas.js';
 import { callGenieSpace } from './tools/genie.js';
+import { searchProductsTool } from './tools/search.js';
 export type { ToolProgressEvent } from './tools/types.js';
 
 /** Captured detail of the last failing call to the model serving endpoint. */
@@ -298,11 +299,22 @@ function makeTools(ctx: AgentContext): Tool[] {
       ),
   });
 
-  // find_shortfall / rank_recovery_moves / execute_recovery_action are
-  // registered so the MODEL knows they exist (and the trainee sees them in
-  // the tool list) — they throw until implemented. ask_data is registered
-  // only when a backend is configured.
-  const tools: Tool[] = [findShortfall, rankRecoveryMoves, executeRecoveryAction];
+  // search_products — Lakebase Search over northpeak.product_search. Powers
+  // the SUBSTITUTE recovery move: retrieves comparable in-stock candidates
+  // from the Build-1 hybrid index (BM25 + pgvector), not a separate store.
+  const searchProducts = searchProductsTool({
+    db: ctx.db,
+    req: ctx.req,
+    databricksHost: ctx.databricksHost,
+  });
+
+  // ask_data is registered only when a backend is configured.
+  const tools: Tool[] = [
+    findShortfall,
+    rankRecoveryMoves,
+    searchProducts,
+    executeRecoveryAction,
+  ];
   if (ctx.masEndpointName || ctx.genieSpaceId) {
     tools.unshift(askData);
   }
@@ -512,6 +524,14 @@ rank_recovery_moves(store_id, product_id) — read the ML recovery model's ranke
   recommended move in your draft, and do any what-if arithmetically from the
   ranking (don't re-call the model). Read-only.
 
+search_products(query, limit) — LAKEBASE SEARCH. Hybrid (BM25 full-text +
+  pgvector semantic) retrieval over the Build-1 index northpeak.product_search
+  — NOT a separate vector store. Call this when the SUBSTITUTE move is in play
+  (the user asks for a comparable/alternative item, or you're drafting a
+  substitute): pass a natural-language description of the needed item and cite
+  the top ranked candidates (product_id, name, category, price) in your draft.
+  Read-only.
+
 execute_recovery_action(store_id, product_id, move_type, units, source_store_id,
   drafted_request, predicted_recaptured_usd) — THE WRITE. Records the approved
   move to Lakebase (transfer/expedite/substitute) + a markdown-hold on the
@@ -550,6 +570,10 @@ Phase 3 (execute_recovery_action) until the user has explicitly approved.
      +$14K recaptured, lowest cost, protects margin both ends"). Offer a what-if
      ("what if 40 units instead of 60?") computed arithmetically from the
      ranking. Draft the transfer/expedite/substitute request memo.
+     If SUBSTITUTE is the chosen or requested move (or the user asks for a
+     comparable item), call search_products FIRST with a description of the
+     needed item and cite the top ranked in-stock candidates from Lakebase
+     Search (product_id, name, price) in the draft.
   5. End with: "Reply **approve** to record this transfer — or tell me what to
      change." STOP HERE. Do not proceed until the user's next message.
 
