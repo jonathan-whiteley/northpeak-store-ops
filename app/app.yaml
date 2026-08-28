@@ -54,3 +54,9 @@ env:
     value: northpeak
   - name: GENIE_SPACE_ID
     value: 01f1a239a6e8167f8ac0914cb0836fd5
+  # Agent LLM: Unity AI Gateway model service (Build 3) — resolves to Claude
+  # Sonnet 5 behind a governed endpoint; invoked via the Responses API at
+  # {host}/ai-gateway/mlflow/v1/responses. The deployed app's principal needs
+  # CAN_QUERY on northpeak_ops.inference.wishcraft-northpeak-llm.
+  - name: AGENT_MODEL
+    value: northpeak_ops.inference.wishcraft-northpeak-llm
